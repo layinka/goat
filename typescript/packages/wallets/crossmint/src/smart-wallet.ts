@@ -1,4 +1,4 @@
-import type { EVMReadRequest, EVMSmartWalletClient as BaseEVMSmartWalletClient, EVMTransaction, EVMTypedData } from "@goat-sdk/core";
+import type { Balance, EVMReadRequest, EVMSmartWalletClient, EVMTransaction, EVMTypedData } from "@goat-sdk/core";
 
 import type { CrossmintApiClient } from "@crossmint/common-sdk-base";
 import type { Abi } from "abitype";
@@ -6,9 +6,8 @@ import { http, createPublicClient, encodeFunctionData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
-import { createCrossmintAPI, SupportedCurrency } from "./api";
+import { createCrossmintAPI, type SupportedEVMCurrency, type GetWalletBalanceResponse } from "./api";
 import { type SupportedSmartWalletChains, getViemChain } from "./chains";
-
 export type CustodialSigner = `0x${string}`;
 
 export type KeyPairSigner = {
@@ -38,15 +37,12 @@ export type SmartWalletOptions = {
     };
 };
 
-export interface EVMSmartWalletClient extends BaseEVMSmartWalletClient {
-    getTokenBalances(params?: { 
-        currencies?: SupportedCurrency[],
-        chains?: string[]
-    }): Promise<any>;
+export interface CrossmintEVMSmartWalletClient extends EVMSmartWalletClient {
+    tokenBalanceOf: (currencies: SupportedEVMCurrency[], chains: SupportedSmartWalletChains[], address: string) => Promise<GetWalletBalanceResponse>
 }
 
 export function smartWalletFactory(crossmintClient: CrossmintApiClient) {
-    return async function smartwallet(params: SmartWalletOptions): Promise<EVMSmartWalletClient> {
+    return async function smartwallet(params: SmartWalletOptions): Promise<CrossmintEVMSmartWalletClient> {
         const { signer, linkedUser, chain, provider, address: providedAddress } = params;
 
         const hasCustodialSigner = typeof signer === "string";
@@ -295,13 +291,11 @@ export function smartWalletFactory(crossmintClient: CrossmintApiClient) {
                     value: balance,
                 };
             },
-            async getTokenBalances(params?: { 
-                currencies?: SupportedCurrency[],
-                chains?: string[]
-            }) {
-                return await client.getWalletBalance(address, {
-                    currencies: params?.currencies ?? ["usdc", "eth"],
-                    chains: params?.chains
+            async tokenBalanceOf(currencies: SupportedEVMCurrency[], chains: SupportedSmartWalletChains[], address: string) {
+                const resolvedAddress = await resolveAddressImpl(address);
+                return await client.getWalletBalance(resolvedAddress, {
+                    currencies: currencies,
+                    chains: chains
                 });
             },
         };
