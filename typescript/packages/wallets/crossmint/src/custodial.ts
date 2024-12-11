@@ -3,6 +3,8 @@ import type { SolanaReadRequest, SolanaTransaction, SolanaWalletClient } from "@
 import { type Connection, PublicKey, TransactionMessage, VersionedTransaction } from "@solana/web3.js";
 import bs58 from "bs58";
 import { createCrossmintAPI } from "./api";
+import type { EVMWalletClient as BaseEVMWalletClient } from "@goat-sdk/core";
+import { SupportedCurrency } from "./api";
 
 type CommonParameters = {
     chain: "solana";
@@ -38,8 +40,15 @@ function getLocator(params: CustodialOptions): string | number {
     return `userId:${params.userId}:solana-custodial-wallet`;
 }
 
+interface EVMWalletClient extends BaseEVMWalletClient {
+    getTokenBalances(params?: { 
+        currencies?: SupportedCurrency[],
+        chains?: string[]
+    }): Promise<any>;
+}
+
 export function custodialFactory(crossmintClient: CrossmintApiClient) {
-    return async function custodial(params: CustodialOptions): Promise<SolanaWalletClient> {
+    return async function custodial(params: CustodialOptions): Promise<EVMWalletClient> {
         const { connection } = params;
 
         const locator = `${getLocator(params)}`;
@@ -138,6 +147,15 @@ export function custodialFactory(crossmintClient: CrossmintApiClient) {
                     symbol: "SOL",
                     name: "Solana",
                 };
+            },
+            async getTokenBalances(params?: { 
+                currencies?: SupportedCurrency[],
+                chains?: string[]
+            }) {
+                return await client.getWalletBalance(address, {
+                    currencies: params?.currencies ?? ["usdc", "sol"],
+                    chains: params?.chains
+                });
             },
         };
     };
