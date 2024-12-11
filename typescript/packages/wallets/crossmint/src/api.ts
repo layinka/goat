@@ -180,6 +180,36 @@ interface ApproveSignatureResponse {
 }
 
 ////////////////////////////////////////////////////////////////////
+// Get Wallet Balance
+////////////////////////////////////////////////////////////////////
+interface WalletBalance {
+    currency: string;
+    decimals: number;
+    balances: {
+        [chain: string]: string;
+        total: string;
+    };
+}
+
+export const SUPPORTED_CURRENCIES = [
+    "eth", "matic", "pol", "sei", "chz", "avax", "xai", "fuel", 
+    "vic", "usdc", "usdce", "busd", "usdxm", "weth", "degen", 
+    "brett", "toshi", "eurc", "superverse", "bonk", "wif", 
+    "mother", "sol", "ada", "bnb", "sui", "apt", "sfuel"
+] as const;
+
+export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
+
+interface GetWalletBalanceParams {
+    currencies: SupportedCurrency[];
+    chains?: string[];
+}
+
+interface GetWalletBalanceResponse {
+    balances: WalletBalance[];
+}
+
+////////////////////////////////////////////////////////////////////
 // API
 ////////////////////////////////////////////////////////////////////
 
@@ -190,7 +220,8 @@ type APIResponse =
     | SubmitApprovalResponse
     | SignMessageResponse
     | SignTypedDataResponse
-    | ApproveSignatureResponse;
+    | ApproveSignatureResponse
+    | GetWalletBalanceResponse;
 
 export function createCrossmintAPI(crossmintClient: CrossmintApiClient) {
     const baseUrl = `${crossmintClient.baseUrl}/api/v1-alpha2`;
@@ -409,6 +440,21 @@ export function createCrossmintAPI(crossmintClient: CrossmintApiClient) {
             return (await request(endpoint, {
                 method: "GET",
             })) as TransactionStatusResponse;
+        },
+        getWalletBalance: async (
+            locator: string, 
+            params: GetWalletBalanceParams
+        ): Promise<GetWalletBalanceResponse> => {
+            const queryParams = new URLSearchParams();
+            queryParams.append('currencies', params.currencies.join(','));
+            if (params.chains) {
+                queryParams.append('chains', params.chains.join(','));
+            }
+            
+            const endpoint = `/wallets/${encodeURIComponent(locator)}/balances?${queryParams}`;
+            return (await request(endpoint, {
+                method: "GET",
+            })) as GetWalletBalanceResponse;
         },
     };
 }

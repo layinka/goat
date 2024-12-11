@@ -2,10 +2,20 @@ import type { CrossmintApiClient } from "@crossmint/common-sdk-base";
 import type { Chain, EVMWalletClient, Plugin } from "@goat-sdk/core";
 import { z } from "zod";
 import { isChainSupportedByFaucet } from "./chains";
+import { SUPPORTED_CURRENCIES, SupportedCurrency } from "./api";
 
 export const topUpBalanceParametersSchema = z.object({
     wallet: z.string().optional().describe("The address to top up the balance of"),
     amount: z.number().min(1).max(100).describe("The amount of tokens to top up"),
+});
+
+export const getBalanceParametersSchema = z.object({
+    wallet: z.string().optional().describe("The address to check the balance of"),
+    currencies: z.array(z.enum(SUPPORTED_CURRENCIES))
+        .default(["usdc", "eth"])
+        .describe("The currencies to check the balance for"),
+    chains: z.array(z.string()).optional()
+        .describe("Optional specific chains to check balances on"),
 });
 
 export function faucetFactory(client: CrossmintApiClient) {
@@ -70,6 +80,25 @@ export function faucetFactory(client: CrossmintApiClient) {
                             }
 
                             throw new Error(`Failed to top up balance: ${await response.text()}`);
+                        },
+                    },
+                    {
+                        name: "check_balance",
+                        description: "This {{tool}} checks the balance of specified currencies in your wallet",
+                        parameters: getBalanceParametersSchema,
+                        method: async (
+                            walletClient: EVMWalletClient,
+                            parameters: z.infer<typeof getBalanceParametersSchema>,
+                        ) => {
+                            const wallet = parameters.wallet ?? walletClient.getAddress();
+                            const resolvedWalletAddress = await walletClient.resolveAddress(wallet);
+
+                            const balances = await client.getWalletBalance(resolvedWalletAddress, {
+                                currencies: parameters.currencies,
+                                chains: parameters.chains,
+                            });
+
+                            return balances;
                         },
                     },
                 ];
