@@ -23,7 +23,7 @@ export function balanceFactory(client: CrossmintApiClient) {
                 return [
                     {
                         name: "get_token_balances",
-                        description: "This {{tool}} gets your wallet token balances",
+                        description: "This {{tool}} gets token balances across multiple chains and tokens for any wallet address",
                         parameters: getBalanceParametersSchema,
                         method: async (
                             walletClient: CrossmintEVMSmartWalletClient | CrossmintSolanaCustodialWalletClient,

@@ -2,7 +2,6 @@ import type { CrossmintApiClient } from "@crossmint/common-sdk-base";
 import type { Chain, EVMWalletClient, Plugin } from "@goat-sdk/core";
 import { z } from "zod";
 import { isChainSupportedByFaucet } from "./chains";
-import { SUPPORTED_CURRENCIES, SupportedCurrency } from "./api";
 
 export const topUpBalanceParametersSchema = z.object({
     wallet: z.string().optional().describe("The address to top up the balance of"),
