@@ -6,10 +6,12 @@ import { useCallback } from "react";
 
 import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
+import { isSolanaWallet } from "@dynamic-labs/solana";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 import { coingecko } from "@goat-sdk/plugin-coingecko";
 import { viem } from "@goat-sdk/wallet-viem";
+import { solana } from "@goat-sdk/wallet-solana";
 import { sendETH } from "../../../../../../packages/core/dist/plugins/send-eth";
 
 export function Conversation() {
@@ -33,12 +35,12 @@ export function Conversation() {
                 throw new Error("Wallet not connected");
             }
 
-            if (!isEthereumWallet(primaryWallet)) {
-                throw new Error("This wallet is not a Ethereum wallet");
+            if (!isSolanaWallet(primaryWallet)) {
+                throw new Error("This wallet is not a Solana wallet");
             }
 
             const tools = await getOnChainTools({
-                wallet: viem(await primaryWallet.getWalletClient()),
+                wallet: solana(primaryWallet),
                 plugins: [
                     sendETH(),
                     coingecko({
@@ -49,6 +51,23 @@ export function Conversation() {
                     logTools: true,
                 },
             });
+
+            // if (!isEthereumWallet(primaryWallet)) {
+            //     throw new Error("This wallet is not a Ethereum wallet");
+            // }
+
+            // const tools = await getOnChainTools({
+            //     wallet: viem(await primaryWallet.getWalletClient()),
+            //     plugins: [
+            //         sendETH(),
+            //         coingecko({
+            //             apiKey: process.env.NEXT_PUBLIC_COINGECKO_API_KEY ?? "",
+            //         }),
+            //     ],
+            //     options: {
+            //         logTools: true,
+            //     },
+            // });
 
             // Start the conversation with your agent
             await conversation.startSession({
