@@ -1,27 +1,25 @@
 {
-    "name": "@goat-sdk/wallet-chromia",
-    "version": "0.2.1",
-    "sideEffects": false,
+    "name": "@goat-sdk/plugin-kim",
+    "version": "0.1.1",
     "files": ["dist/**/*", "README.md", "package.json"],
     "scripts": {
         "build": "tsup",
         "clean": "rm -rf dist",
         "test": "vitest run --passWithNoTests"
     },
+    "sideEffects": false,
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
     "dependencies": {
         "@goat-sdk/core": "workspace:*",
-        "@chromia/ft4": "1.0.1",
-        "postchain-client": "1.20.1",
+        "@goat-sdk/wallet-evm": "workspace:*",
         "viem": "catalog:",
         "zod": "catalog:"
     },
     "peerDependencies": {
         "@goat-sdk/core": "workspace:*",
-        "@chromia/ft4": "1.0.1",
-        "postchain-client": "1.20.1"
+        "viem": "catalog:"
     },
     "homepage": "https://ohmygoat.dev",
     "repository": {
