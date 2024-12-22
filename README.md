@@ -9,14 +9,29 @@ GOAT is free software, MIT licensed, sponsored by [Crossmint](https://www.crossm
 </div>
 
 ## Goat 🐐
-GOAT 🐐 (Great Onchain Agent Toolkit) is an open-source framework for adding blockchain tools such as wallets, being able to hold or trade tokens, or interacting with blockchain smart contracts, to your AI agent.
+GOAT 🐐 (Great Onchain Agent Toolkit) is an open-source library of blockchain tools for AI agents. Example tools include
+wallets, sending tokens, minting NFTs, or interacting with protocols like Polymarket, Uniswap.
 
-**Problem**: 
+### Why?
 
-Making agents perform onchain actions is tedious. The ecosystem is heavily fragmented, spanning 5+ popular agent development frameworks, multiple programming languages, and dozens of different blockchains and wallet architectures.
-For developers without blockchain expertise, finding clear instructions to perform simple actions - like sending USDC payments or placing Polymarket bets - is nearly impossible.
+Blockchains and web3 protocols can be a powerful tool for AI agents, enabling them become financial agents and tap into
+a global, unstoppable computer with hundreds of use cases.
 
-**Solution**: 
+However, making agents perform onchain actions is tedious. Finding common instructions to perform simple actions - like
+sending USDC payments or placing Polymarket bets - to work with whatever agent framework you're using is nearly
+impossible.
+
+GOAT aims to be the biggest compendium of blockchain tools for agents, compatible with all the popular agent frameworks,
+blockchains, and wallets.
+
+## How? 
+
+GOAT is an open-source library, designed with the following guiding principles:
+* **Provider Agnostic**: Works with any wallet provider, including your own key pairs, [Crossmint Smart Wallets](https://docs.crossmint.com/wallets/smart-wallets/overview), and Coinbase.
+* **Framework Agnostic**: Works with all the popular agent frameworks, including Langchain, Vercel's AI SDK, Eliza, and more.
+* **Language Agnostic**: Works with Typescript and Python.
+* **Blockchain Agnostic**: Works with all the popular blockchains, including EVM chains and Solana.
+* Agent experience
 
 GOAT solves this by providing an open-source, provider-agnostic framework that abstracts away all these combinations.
 
