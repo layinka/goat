@@ -63,6 +63,9 @@ ${conversationHistory
     .join('\n')}
 
 Current request: ${prompt}`,
+                onStepFinish: (event) => {
+                    console.log('Tool execution:', event.toolResults);
+                },
             });
 
             conversationHistory.push({ role: 'assistant', content: result.text });
