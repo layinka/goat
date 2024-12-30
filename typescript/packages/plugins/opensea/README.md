@@ -1,6 +1,6 @@
 # Goat Opensea Plugin 🐐 - TypeScript
 
-Opensea plugin for [Goat 🐐](https://ohmygoat.dev). Allows you to create tools for getting NFT collection statistics from Opensea.
+Opensea plugin for [Goat 🐐](https://ohmygoat.dev). Allows you to create tools for getting NFT collection data from Opensea.
 
 ## Installation
 ```
