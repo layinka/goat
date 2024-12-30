@@ -1,6 +1,6 @@
 # Goat Allora Plugin 🐐 (TypeScript)
 
-(Allora Network)[https://allora.network] plugin for Goat. Provides developers with direct access to advanced, self-improving AI inferences, enabling high-performance insights without introducing additional complexity. Developers can create smarter and more efficient AI agents while maintaining the streamlined experience GOAT is known for.
+[Allora Network](https://allora.network) plugin for Goat. Allora Network is an AI-powered inference platform that delivers real-time, self-improving predictions and insights for various use cases. By aggregating and analyzing data from diverse sources—such as blockchain networks and off-chain APIs—Allora seamlessly provides low-latency, high-performance predictive analytics without requiring complex infrastructure. The platform’s intuitive approach allows developers to focus on building intelligence-driven solutions, while Allora takes care of the heavy lifting behind the scenes.
 
 ## Installation
 
@@ -22,7 +22,7 @@ const plugin = allora({
 
 ### Fetch Price Prediction
 
-Fetches the current trending cryptocurrencies.
+Fetches a price prediction for the given asset and timeframe.
 
 ## Goat
 

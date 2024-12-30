@@ -1,6 +1,4 @@
-import path from 'path'
 import axios from 'axios'
-import { Token, SolanaTokenData } from './tokens'
 
 export interface AlloraInferenceData {
     network_inference: string
@@ -33,20 +31,32 @@ export enum AlloraPricePredictionTimeframe {
     '8h' = '8h',
 }
 
+export enum AlloraPricePredictionSignatureFormat {
+    EthereumSepolia = 'ethereum-11155111'
+}
+
+export interface AlloraAPIClientOptions {
+    apiKey?: string
+    apiRoot?: string
+}
+
 export class AlloraAPIClient {
-    private apiKey:  string
+    private apiKey:  string | null | undefined
     private apiRoot: string
 
-    constructor(apiKey: string, apiRoot: string = 'https://api.upshot.xyz/v2/allora') {
-        this.apiKey  = apiKey
-        this.apiRoot = apiRoot[apiRoot.length - 1] === '/' ? apiRoot.substr(0, apiRoot.length - 1) : apiRoot
+    constructor(opts: AlloraAPIClientOptions) {
+        this.apiKey  = opts.apiKey
+
+        opts.apiRoot = opts.apiRoot || 'https://api.upshot.xyz/v2/allora'
+        this.apiRoot = opts.apiRoot[opts.apiRoot.length - 1] === '/' ? opts.apiRoot.substr(0, opts.apiRoot.length - 1) : opts.apiRoot
     }
 
     public async fetchAlloraPricePrediction(
-        asset: AlloraPricePredictionToken,
-        timeframe: AlloraPricePredictionTimeframe,
+        asset:           AlloraPricePredictionToken,
+        timeframe:       AlloraPricePredictionTimeframe,
+        signatureFormat: AlloraPricePredictionSignatureFormat = AlloraPricePredictionSignatureFormat.EthereumSepolia,
     ): Promise<Partial<AlloraInferenceData>> {
-        const url = `consumer/price/ethereum-11155111/${asset}/${timeframe}`
+        const url = `consumer/price/${signatureFormat}/${asset}/${timeframe}`
         const resp = await this.fetchAlloraAPIData(url)
         if (!resp?.data?.inference_data) {
             throw new Error(`API response missing data: ${JSON.stringify(resp)}`)
@@ -58,13 +68,15 @@ export class AlloraAPIClient {
         endpoint = endpoint[0] === '/' ? endpoint.substr(1) : endpoint
 
         const url = `${this.apiRoot}/${endpoint}`
-        const response = await axios.get(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept':       'application/json',
-                'x-api-key':    this.apiKey,
-            },
-        })
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'Accept':       'application/json',
+        }
+        if (!!this.apiKey) {
+            headers['x-api-key'] = this.apiKey
+        }
+
+        const response = await axios.get(url, { headers })
         if (response.status >= 400) {
             throw new Error(`Allora plugin: error requesting price prediction: url=${url} status=${response.status} body=${JSON.stringify(response.data, null, 4)}`)
         }

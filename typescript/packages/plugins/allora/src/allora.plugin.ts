@@ -1,22 +1,20 @@
 import { PluginBase } from '@goat-sdk/core'
 import { AlloraService } from './allora.service'
-import { PricePredictionTimeframes } from './types'
 
-interface AlloraPluginOptions {
-    apiKey: string
-    network: 'mainnet' | 'testnet'
+export interface AlloraPluginOptions {
+    apiKey?: string
+    apiRoot?: string
 }
 
 export class AlloraPlugin extends PluginBase {
-    constructor({ apiKey }: AlloraPluginOptions) {
-        super('allora', [ new AlloraService(apiKey) ])
+    constructor(opts: AlloraPluginOptions) {
+        super('allora', [ new AlloraService(opts) ])
     }
 
     supportsChain = () => true
 }
 
 export function allora(options: AlloraPluginOptions) {
-    options.network = options.network || 'testnet'
     return new AlloraPlugin(options)
 }
 
