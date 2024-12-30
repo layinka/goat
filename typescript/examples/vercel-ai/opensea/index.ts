@@ -31,7 +31,7 @@ const walletClient = createWalletClient({
         model: openai("gpt-4o-mini"),
         tools: tools,
         maxSteps: 5,
-        prompt: "Give me collection statistics for Nouns",
+        prompt: "Get me NFT collection statistics of Nouns and information of recent sales",
     });
 
     console.log(result.text);
