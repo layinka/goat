@@ -1,10 +1,14 @@
 import { Tool } from "@goat-sdk/core";
 import { z } from "zod";
-import { GetNftCollectionStatisticsParametersSchema, GetNftCollectionStatisticsResponseSchema, GetNftSalesParametersSchema, GetNftSalesResponseSchema } from "./parameters";
+import {
+    GetNftCollectionStatisticsParametersSchema,
+    GetNftCollectionStatisticsResponseSchema,
+    GetNftSalesParametersSchema,
+    GetNftSalesResponseSchema,
+} from "./parameters";
 
 export class OpenseaService {
-
-    constructor(private readonly apiKey: string) { }
+    constructor(private readonly apiKey: string) {}
 
     @Tool({
         description: "Get NFT collection statistics",
@@ -16,13 +20,15 @@ export class OpenseaService {
                 `https://api.opensea.io/api/v2/collections/${parameters.collectionSlug}/stats`,
                 {
                     headers: {
-                        "accept": "application/json",
+                        accept: "application/json",
                         "x-api-key": this.apiKey,
                     },
                 },
             );
 
-            nftCollectionStatistics = (await response.json()) as z.infer<typeof GetNftCollectionStatisticsResponseSchema>;
+            nftCollectionStatistics = (await response.json()) as z.infer<
+                typeof GetNftCollectionStatisticsResponseSchema
+            >;
         } catch (error) {
             throw new Error(`Failed to get NFT collection statistics: ${error}`);
         }
@@ -40,7 +46,7 @@ export class OpenseaService {
                 `https://api.opensea.io/api/v2/events/collection/${parameters.collectionSlug}?event_type=sale&limit=5`,
                 {
                     headers: {
-                        "accept": "application/json",
+                        accept: "application/json",
                         "x-api-key": this.apiKey,
                     },
                 },
@@ -51,6 +57,13 @@ export class OpenseaService {
             throw new Error(`Failed to get NFT sales: ${error}`);
         }
 
-        return nftSales.asset_events.map(event => { return { name: event.nft.name, seller: event.seller, buyer: event.buyer, price: Number(event.payment.quantity) / (10 ** 18) } });
+        return nftSales.asset_events.map((event) => {
+            return {
+                name: event.nft.name,
+                seller: event.seller,
+                buyer: event.buyer,
+                price: Number(event.payment.quantity) / 10 ** 18,
+            };
+        });
     }
 }
