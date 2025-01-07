@@ -8,7 +8,7 @@ export class BalancePlugin extends PluginBase<WalletClientBase> {
     }
 
     supportsChain(chain: Chain) {
-        return chain.type === "evm" || chain.type === "solana";
+        return chain.type === "evm" || chain.type === "solana" || chain.type === "sui" || chain.type === "aptos";
     }
 }
 
