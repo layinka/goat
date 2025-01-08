@@ -38,7 +38,7 @@ export class DexscreenerService {
         name: "dexscreener.get_token_pairs_by_token_address",
         description: "Get all DEX pairs for given token addresses (up to 30) from Dexscreener",
     })
-    async get_token_pairs_by_token_address(parameters: GetTokenPairsParameters) {
+    async getTokenPairsByTokenAddress(parameters: GetTokenPairsParameters) {
         if (parameters.tokenAddresses.length > 30) {
             throw new Error("Maximum of 30 token addresses allowed per request");
         }
