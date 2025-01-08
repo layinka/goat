@@ -1429,18 +1429,18 @@ importers:
       '@goat-sdk/core':
         specifier: workspace:*
         version: link:../../core
+      axios:
+        specifier: ^1.6.2
+        version: 1.7.9
       bitcoinjs-lib:
-        specifier: 6.1.7
+        specifier: ^6.1.5
         version: 6.1.7
       ecpair:
-        specifier: 3.0.0-rc.0
-        version: 3.0.0-rc.0(typescript@5.6.3)
+        specifier: ^2.1.0
+        version: 2.1.0
       tiny-secp256k1:
-        specifier: 2.2.3
+        specifier: ^2.2.3
         version: 2.2.3
-      zod:
-        specifier: 3.24.1
-        version: 3.24.1
     devDependencies:
       tsup:
         specifier: ^8.0.0
@@ -1448,6 +1448,9 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.6.3
+      zod:
+        specifier: 'catalog:'
+        version: 3.23.8
 
   packages/wallets/chromia:
     dependencies:
@@ -6436,11 +6439,11 @@ packages:
   bs58@6.0.0:
     resolution: {integrity: sha512-PD0wEnEYg6ijszw/u8s+iI3H17cTymlrwkKhDhPZq+Sokl3AU4htyBFTjAeNAlCCmg0f53g6ih3jATyCKftTfw==}
 
+  bs58check@2.1.2:
+    resolution: {integrity: sha512-0TS1jicxdU09dwJMNZtVAfzPi6Q6QeN0pM1Fkzrjn+XYHvzMKPU3pHVpva+769iNVSfIYWf7LJ6WR+BuuMf8cA==}
+
   bs58check@3.0.1:
     resolution: {integrity: sha512-hjuuJvoWEybo7Hn/0xOrczQKKEKD63WguEjlhLExYs2wUBcebDC1jDNK17eEAD2lYfw82d5ASC1d7K3SWszjaQ==}
-
-  bs58check@4.0.0:
-    resolution: {integrity: sha512-FsGDOnFg9aVI9erdriULkd/JjEWONV/lQE5aYziB5PoBsXRind56lh8doIZIc9X4HoxT5x4bLjMWN1/NB8Zp5g==}
 
   bser@2.1.1:
     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
@@ -7110,9 +7113,9 @@ packages:
     resolution: {integrity: sha512-zBdtR4K+wbj10bWPpIOF9DW+eFYQu8miU5ypunh0t4Bvt83ZPlEWgT5Dq/0G6uwEXumZKjfb5BZxYUZQ2Hzn/Q==}
     engines: {bun: '>=1', deno: '>=2', node: '>=16'}
 
-  ecpair@3.0.0-rc.0:
-    resolution: {integrity: sha512-y2CTHgI2MMeYiXd8IFgxgORWR1PpyeUACek4viZm12VcbooWhVnqFEHISO0NAiZKJb7CqXEOz5bnhv/UI0ULzw==}
-    engines: {node: '>=18.0.0'}
+  ecpair@2.1.0:
+    resolution: {integrity: sha512-cL/mh3MtJutFOvFc27GPZE2pWL3a3k4YvzUWEOvilnfZVlH3Jwgx/7d6tlD7/75tNk8TG2m+7Kgtz0SI1tWcqw==}
+    engines: {node: '>=8.0.0'}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -10835,10 +10838,6 @@ packages:
     resolution: {integrity: sha512-vrrNZJiusLWoFWBqz5Y5KMCgP9W9hnjZHzZiZRT8oNAkq3d5Z5Oe76jAvVVSRh4U8GGR90N2X1dWtrhvx6L8UQ==}
     engines: {node: '>=14.0.0'}
 
-  uint8array-tools@0.0.8:
-    resolution: {integrity: sha512-xS6+s8e0Xbx++5/0L+yyexukU7pz//Yg6IHg3BKhXotg1JcYtgxVcUctQ0HxLByiJzpAkNFawz1Nz5Xadzo82g==}
-    engines: {node: '>=14.0.0'}
-
   uint8arrays@3.1.0:
     resolution: {integrity: sha512-ei5rfKtoRO8OyOIor2Rz5fhzjThwIHJZ3uyDPnDHTXbP0aMQ1RN/6AI5B5d9dBxJOU+BvOAk7ZQ1xphsX8Lrog==}
 
@@ -11069,14 +11068,6 @@ packages:
 
   valibot@0.36.0:
     resolution: {integrity: sha512-CjF1XN4sUce8sBK9TixrDqFM7RwNkuXdJu174/AwmQUB62QbCQADg5lLe8ldBalFgtj1uKj+pKwDJiNo4Mn+eQ==}
-
-  valibot@0.37.0:
-    resolution: {integrity: sha512-FQz52I8RXgFgOHym3XHYSREbNtkgSjF9prvMFH1nBsRyfL6SfCzoT1GuSDTlbsuPubM7/6Kbw0ZMQb8A+V+VsQ==}
-    peerDependencies:
-      typescript: '>=5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   valid-url@1.0.9:
     resolution: {integrity: sha512-QQDsV8OnSf5Uc30CKSwG9lnhMPe6exHtTXLRYX8uMwKENy640pU+2BgBL0LRbDh/eYRahNCS7aewCx0wf3NYVA==}
@@ -11356,8 +11347,8 @@ packages:
   wide-align@1.1.5:
     resolution: {integrity: sha512-eDMORYaPNZ4sQIuuYPDHdQvf4gyCF9rEEV/yPxGfwPkRodwEgiMUUXTx/dex+Me0wxx53S+NgUHaP7y3MGlDmg==}
 
-  wif@5.0.0:
-    resolution: {integrity: sha512-iFzrC/9ne740qFbNjTZ2FciSRJlHIXoxqk/Y5EnE08QOXu1WjJyCCswwDTYbohAOEnlCtLaAAQBhyaLRFh2hMA==}
+  wif@2.0.6:
+    resolution: {integrity: sha512-HIanZn1zmduSF+BQhkE+YXIbEiH0xPr1012QbFEGB0xsKqJii0/SqJjyn8dFv6y36kOznMgMB+LGcbZTJ1xACQ==}
 
   wikipedia@2.1.2:
     resolution: {integrity: sha512-RAYaMpXC9/E873RaSEtlEa8dXK4e0p5k98GKOd210MtkE5emm6fcnwD+N6ZA4cuffjDWagvhaQKtp/mGp2BOVQ==}
@@ -19746,15 +19737,16 @@ snapshots:
     dependencies:
       base-x: 5.0.0
 
+  bs58check@2.1.2:
+    dependencies:
+      bs58: 4.0.1
+      create-hash: 1.2.0
+      safe-buffer: 5.2.1
+
   bs58check@3.0.1:
     dependencies:
       '@noble/hashes': 1.7.0
       bs58: 5.0.0
-
-  bs58check@4.0.0:
-    dependencies:
-      '@noble/hashes': 1.7.0
-      bs58: 6.0.0
 
   bser@2.1.1:
     dependencies:
@@ -20417,13 +20409,11 @@ snapshots:
       '@noble/curves': 1.8.0
       '@noble/hashes': 1.7.0
 
-  ecpair@3.0.0-rc.0(typescript@5.6.3):
+  ecpair@2.1.0:
     dependencies:
-      uint8array-tools: 0.0.8
-      valibot: 0.37.0(typescript@5.6.3)
-      wif: 5.0.0
-    transitivePeerDependencies:
-      - typescript
+      randombytes: 2.1.0
+      typeforce: 1.18.0
+      wif: 2.0.6
 
   ee-first@1.1.1: {}
 
@@ -24884,8 +24874,6 @@ snapshots:
 
   uint8array-tools@0.0.7: {}
 
-  uint8array-tools@0.0.8: {}
-
   uint8arrays@3.1.0:
     dependencies:
       multiformats: 9.9.0
@@ -25048,10 +25036,6 @@ snapshots:
   v8-compile-cache-lib@3.0.1: {}
 
   valibot@0.36.0: {}
-
-  valibot@0.37.0(typescript@5.6.3):
-    optionalDependencies:
-      typescript: 5.6.3
 
   valid-url@1.0.9: {}
 
@@ -25553,9 +25537,9 @@ snapshots:
       string-width: 4.2.3
     optional: true
 
-  wif@5.0.0:
+  wif@2.0.6:
     dependencies:
-      bs58check: 4.0.0
+      bs58check: 2.1.2
 
   wikipedia@2.1.2:
     dependencies:
