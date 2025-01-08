@@ -31,7 +31,7 @@ export class BitcoinKeyPairWalletClient extends BitcoinWalletClient {
             publicKey: keyPair.publicKey,
         };
         this.network = network;
-        
+
         // Configure BlockCypher service based on network
         const networkType = network === bitcoin.networks.bitcoin ? "main" : "test";
         this.blockCypherService = new BlockCypherService(networkType);
@@ -76,12 +76,12 @@ export class BitcoinKeyPairWalletClient extends BitcoinWalletClient {
     async sendTransaction(transaction: BitcoinTransaction): Promise<BitcoinTransactionResponse> {
         const address = this.getAddress();
         const utxos = await this.blockCypherService.getUTXOs(address);
-        
+
         if (utxos.length === 0) {
             throw new Error("No UTXOs available for spending");
         }
 
-        const feeRate = transaction.feeRate || await this.blockCypherService.getFeeRate();
+        const feeRate = transaction.feeRate || (await this.blockCypherService.getFeeRate());
         const psbt = new bitcoin.Psbt({ network: this.network });
 
         // Add inputs

@@ -69,7 +69,7 @@ export class BlockCypherService {
 
     async getTransaction(txId: string): Promise<{ hex: string }> {
         const response = await axios.get(`${BLOCKCYPHER_API_BASE}/${this.network}/txs/${txId}?includeHex=true`);
-        
+
         if (!response.data.hex) {
             throw new Error("Transaction hex not available");
         }
