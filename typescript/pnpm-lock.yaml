@@ -1009,10 +1009,6 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 3.23.8
-    devDependencies:
-      typescript:
-        specifier: ^5.0.0
-        version: 5.6.3
 
   packages/plugins/erc20:
     dependencies:
