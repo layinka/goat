@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "goat-sdk-plugin-coinmarketcap"
+version = "0.1.0"
+description = "Goat plugin for Coinmarketcap"
+authors = ["Andrea Villa <andreakarimodm@gmail.com>"]
+readme = "README.md"
+keywords = ["goat", "sdk", "web3", "agents", "ai"]
+homepage = "https://ohmygoat.dev/"
+repository = "https://github.com/goat-sdk/goat"
+packages = [
+    { include = "goat_plugins/coinmarketcap" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiohttp = "^3.8.6"
+goat-sdk = "^0.1.0"
