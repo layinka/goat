@@ -15,3 +15,15 @@ packages = [
 python = "^3.10"
 aiohttp = "^3.8.6"
 goat-sdk = "^0.1.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.25.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8.6"
+goat-sdk = { path = "../../goat-sdk", develop = true }
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
