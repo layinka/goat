@@ -1,7 +1,7 @@
 import { type Chain, PluginBase } from "@goat-sdk/core";
 import { arbitrum, avalanche, base, celo, mainnet, optimism, polygon, zora } from "viem/chains";
-import { UniswapService } from "./uniswap.service";
 import type { UniswapCtorParams } from "./types/UniswapCtorParams";
+import { UniswapService } from "./uniswap.service";
 
 const SUPPORTED_CHAINS = [mainnet, polygon, avalanche, base, optimism, zora, arbitrum, celo];
 
