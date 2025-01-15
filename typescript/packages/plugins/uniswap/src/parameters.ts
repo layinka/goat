@@ -1,6 +1,16 @@
 import { createToolParameters } from "@goat-sdk/core";
 import { z } from "zod";
 
+enum ProtocolType {
+    V2 = "V2",
+    V3 = "V3",
+    V4 = "V4",
+    UNISWAPX = "UNISWAPX",
+    UNISWAPX_V2 = "UNISWAPX_V2",
+    UNISWAPX_V3 = "UNISWAPX_V3",
+    PRIORITY = "PRIORITY",
+}
+
 enum SwapType {
     EXACT_IN = "EXACT_IN",
     EXACT_OUT = "EXACT_OUT",
@@ -9,6 +19,11 @@ enum SwapType {
 enum Protocol {
     V2 = "V2",
     V3 = "V3",
+    V4 = "V4",
+    UNISWAPX = "UNISWAPX",
+    UNISWAPX_V2 = "UNISWAPX_V2",
+    UNISWAPX_V3 = "UNISWAPX_V3",
+    PRIORITY = "PRIORITY",
 }
 
 enum Routing {
@@ -91,5 +106,153 @@ export class GetSwapBodySchema extends createToolParameters(
         permitData: z.any().optional(),
         signature: z.string().optional(),
         simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export const PositionSchema = z.object({
+    token0: z.string(),
+    token1: z.string(),
+    fee: z.number(),
+    tickLower: z.number(),
+    tickUpper: z.number(),
+});
+
+export const BatchPermitDataSchema = z.object({
+    domain: z.string(),
+    types: z.record(z.string(), z.any()),
+    primaryType: z.string(),
+    message: z.record(z.string(), z.any()),
+});
+
+export class CheckLiquidityApprovalSchema extends createToolParameters(
+    z.object({
+        protocol: z.nativeEnum(ProtocolType),
+        token0: z.string(),
+        token1: z.string(),
+        positionToken: z.string(),
+        chainId: z.number(),
+        walletAddress: z.string(),
+        amount0: z.string(),
+        amount1: z.string(),
+        positionAmount: z.string(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class CreatePoolAndPositionSchema extends createToolParameters(
+    z.object({
+        protocol: z.nativeEnum(ProtocolType),
+        position: PositionSchema,
+        walletAddress: z.string(),
+        chainId: z.number(),
+        initialPrice: z.string(),
+        poolLiquidity: z.string(),
+        currentTick: z.number(),
+        sqrtRatioX96: z.string(),
+        amount0: z.string(),
+        amount1: z.string(),
+        slippageTolerance: z.number(),
+        deadline: z.number(),
+        signature: z.string().optional(),
+        batchPermitData: BatchPermitDataSchema.optional(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class IncreaseLPSchema extends createToolParameters(
+    z.object({
+        protocol: z.nativeEnum(ProtocolType),
+        tokenId: z.number(),
+        position: PositionSchema,
+        poolLiquidity: z.string(),
+        currentTick: z.number(),
+        sqrtRatioX96: z.string(),
+        walletAddress: z.string(),
+        chainId: z.number(),
+        amount0: z.string(),
+        amount1: z.string(),
+        slippageTolerance: z.number(),
+        deadline: z.number(),
+        signature: z.string().optional(),
+        batchPermitData: BatchPermitDataSchema.optional(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class DecreaseLPSchema extends createToolParameters(
+    z.object({
+        protocol: z.nativeEnum(ProtocolType),
+        tokenId: z.number(),
+        position: PositionSchema,
+        walletAddress: z.string(),
+        chainId: z.number(),
+        liquidityPercentageToDecrease: z.number(),
+        liquidity0: z.string(),
+        liquidity1: z.string(),
+        slippageTolerance: z.number(),
+        poolLiquidity: z.string(),
+        currentTick: z.number(),
+        sqrtRatioX96: z.string(),
+        positionLiquidity: z.string(),
+        expectedTokenOwed0RawAmount: z.string(),
+        expectedTokenOwed1RawAmount: z.string(),
+        collectAsWETH: z.boolean(),
+        deadline: z.number(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class ClaimFeesSchema extends createToolParameters(
+    z.object({
+        protocol: z.nativeEnum(ProtocolType),
+        tokenId: z.number(),
+        position: PositionSchema,
+        walletAddress: z.string(),
+        chainId: z.number(),
+        expectedTokenOwed0RawAmount: z.string(),
+        expectedTokenOwed1RawAmount: z.string(),
+        collectAsWETH: z.boolean(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class MigrateLPSchema extends createToolParameters(
+    z.object({
+        tokenId: z.number(),
+        walletAddress: z.string(),
+        chainId: z.number(),
+        inputProtocol: z.nativeEnum(ProtocolType),
+        inputPosition: PositionSchema,
+        inputPoolLiquidity: z.string(),
+        inputCurrentTick: z.number(),
+        inputSqrtRatioX96: z.string(),
+        inputPositionLiquidity: z.string(),
+        signature: z.string().optional(),
+        amount0: z.string(),
+        amount1: z.string(),
+        outputProtocol: z.nativeEnum(ProtocolType),
+        outputPosition: PositionSchema,
+        initialPrice: z.string().optional(),
+        outputPoolLiquidity: z.string().optional(),
+        outputCurrentTick: z.number().optional(),
+        outputSqrtRatioX96: z.string().optional(),
+        expectedTokenOwed0RawAmount: z.string(),
+        expectedTokenOwed1RawAmount: z.string(),
+        slippageTolerance: z.number(),
+        deadline: z.number(),
+        signatureDeadline: z.number(),
+        simulateTransaction: z.boolean().optional(),
+    }),
+) {}
+
+export class GetRouterAddressSchema extends createToolParameters(
+    z.object({
+        chainId: z.number(),
+    }),
+) {}
+
+export class GetSwappableTokensSchema extends createToolParameters(
+    z.object({
+        chainId: z.number(),
     }),
 ) {}
