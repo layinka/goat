@@ -1,13 +1,10 @@
 import asyncio
-from typing import Dict, List, Optional, TypedDict, Union, TypeVar, cast
+from typing import Dict, List, Optional, TypedDict, Union, cast
 from goat_wallets.evm import EVMWalletClient, EVMTransaction, EVMReadRequest, EVMTypedData
-from eth_typing import HexStr
+from web3 import Web3
 from web3.main import AsyncWeb3
-from web3.types import Wei
 from web3.providers.async_rpc import AsyncHTTPProvider
-from web3.eth import AsyncEth
 from web3._utils.validation import validate_address
-from web3._utils.encoding import to_hex, to_bytes
 from eth_account.messages import encode_defunct
 from eth_account import Account
 from .api_client import CrossmintWalletsAPI, Call

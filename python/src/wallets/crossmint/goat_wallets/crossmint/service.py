@@ -1,13 +1,10 @@
-import aiohttp
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
 from goat_wallets.solana import SolanaWalletClient
 from .parameters import (
     CreateSmartWalletParameters,
     CreateCustodialWalletParameters,
-    CreateWalletRequest,
     WalletResponse,
-    SignMessageRequest,
     SignatureResponse,
     TransactionResponse,
     Call
