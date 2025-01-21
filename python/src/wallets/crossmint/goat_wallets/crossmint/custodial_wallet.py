@@ -1,7 +1,6 @@
 import asyncio
-from typing import Dict, List, Optional, TypedDict, Union, Any
+from typing import Dict
 import base58
-from solana.rpc.commitment import Confirmed
 from solana.transaction import Transaction, TransactionInstruction
 from solders.pubkey import Pubkey
 from solana.rpc.async_api import AsyncClient as AsyncSolanaClient

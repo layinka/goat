@@ -1,7 +1,6 @@
 from enum import Enum
-from pydantic import BaseModel, Field, EmailStr
-from typing import Optional, List, Union, Dict, Any
-from goat_wallets.evm import EVMTypedData
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
 
 
 class CoreSignerType(str, Enum):

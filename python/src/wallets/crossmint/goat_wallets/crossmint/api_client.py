@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, TypedDict, Union
+from typing import Any, Dict, List, Optional
 import aiohttp
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 import json
 from urllib.parse import quote
 from goat_wallets.evm import EVMTypedData
