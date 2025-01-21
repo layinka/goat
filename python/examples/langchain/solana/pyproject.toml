@@ -19,7 +19,7 @@ python-dotenv = "*"
 solana = {version = "^0.30.2", extras = ["spl"]}
 solders = "^0.18.0"
 anchorpy = "^0.18.0"
-goat-sdk = "*"
+goat-sdk = { path = "../../../src/goat-sdk", develop = true }
 goat-sdk-wallet-solana = {path = "../../../src/wallets/solana", develop = true}
 goat-sdk-wallet-crossmint = { path = "../../../src/wallets/crossmint", develop = true }
 goat-sdk-adapter-langchain = { path = "../../../src/adapters/langchain", develop = true }
