@@ -26,7 +26,7 @@ const keypair = Keypair.fromSecretKey(base58.decode(process.env.WALLET_PRIVATE_K
         }),
         plugins: [
             sendSOL(), // Enable SOL transfers
-            sns(),     // Enable SNS domain resolution
+            sns(), // Enable SNS domain resolution
         ],
     });
 
