@@ -28,6 +28,8 @@ require("dotenv").config();
         account: Account,
     };
 
+    // TODO(alfonso-paella) Is "command-r-plus" the recommended model for this example?
+    // Should we document model options or let users choose their preferred model?
     const llm = new ChatCohere({
         model: "command-r-plus",
     });
@@ -50,6 +52,8 @@ require("dotenv").config();
         tools,
     });
 
+    // TODO(alfonso-paella) The example inputs use {{PRYZM}} and {{_addr}} template syntax,
+    // but the README shows {TOKEN} and {ADDRESS}. Which format is correct?
     const response = await agentExecutor.invoke({
         //input: "get the {{PRYZM}} token total supply",
         //input: "get the {{PRYZM}} token balance of this address {{_addr}}",
