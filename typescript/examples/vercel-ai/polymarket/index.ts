@@ -29,6 +29,8 @@ const terminal = readline.createInterface({
 const messages: CoreMessage[] = [];
 
 async function main() {
+    // TODO(alfonso-paella) Should we document the polymarket plugin configuration options?
+    // What are the available settings beyond credentials?
     const tools = await getOnChainTools({
         wallet: viem(walletClient),
         plugins: [
@@ -47,11 +49,13 @@ async function main() {
         messages.push({ role: "user", content: userInput });
 
         try {
+            // TODO(alfonso-paella) Should we document the maxSteps parameter?
+            // What's the recommended value for different Polymarket operations?
             const result = streamText({
                 model: openai("gpt-4o-mini"),
                 messages,
                 tools: tools,
-                maxSteps: 5,
+                maxSteps: 5, // Maximum number of tool invocations per request
             });
 
             let fullResponse = "";
