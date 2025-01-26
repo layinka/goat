@@ -24,6 +24,8 @@ const walletClient = createWalletClient({
     chain: sepolia,
 });
 
+// TODO(alfonso-paella) Is "gpt-4o-mini" the recommended model for this example?
+// Should we document available model options?
 const llm = new ChatOpenAI({
     model: "gpt-4o-mini",
 });
@@ -47,6 +49,8 @@ const llm = new ChatOpenAI({
         tools,
     });
 
+    // TODO(alfonso-paella) Should we demonstrate all supported operations?
+    // The example includes PEPE token and ETH send support but only shows USDC balance check
     const response = await agentExecutor.invoke({
         input: "Get my balance in USDC",
     });
