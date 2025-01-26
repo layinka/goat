@@ -24,13 +24,19 @@ const walletClient = createWalletClient({
 (async () => {
     const tools = await getOnChainTools({
         wallet: viem(walletClient),
+        // TODO(alfonso-paella) Should we document the opensea plugin capabilities?
+        // What are the available API endpoints and rate limits?
         plugins: [opensea(process.env.OPENSEA_API_KEY as string)],
     });
 
     const result = await generateText({
         model: openai("gpt-4o-mini"),
         tools: tools,
+        // TODO(alfonso-paella) Should we document the maxSteps parameter?
+        // What's the recommended value for different OpenSea operations?
         maxSteps: 5,
+        // TODO(alfonso-paella) Should we provide more example prompts?
+        // What other collection statistics and sales info can be queried?
         prompt: "Get me NFT collection statistics of Nouns and information of recent sales",
     });
 
