@@ -9,6 +9,8 @@ import { privateKeyToAccount } from "viem/accounts";
 import { base } from "viem/chains";
 
 import { getOnChainTools } from "@goat-sdk/adapter-vercel-ai";
+// TODO(alfonso-paella) Should we document supported ERC20 tokens?
+// What are the requirements for adding new tokens?
 import { PEPE, USDC, erc20 } from "@goat-sdk/plugin-erc20";
 
 import { uniswap } from "@goat-sdk/plugin-uniswap";
@@ -26,15 +28,17 @@ const walletClient = createWalletClient({
 });
 
 (async () => {
+    // TODO(alfonso-paella) Should we document the plugin configuration options?
+    // What are the recommended settings for different token pairs?
     const tools = await getOnChainTools({
         wallet: viem(walletClient),
         plugins: [
-            sendETH(),
-            erc20({ tokens: [USDC, PEPE] }),
+            sendETH(), // Enable ETH transfers
+            erc20({ tokens: [USDC, PEPE] }), // Enable ERC20 token operations
             uniswap({
                 baseUrl: process.env.UNISWAP_BASE_URL as string,
                 apiKey: process.env.UNISWAP_API_KEY as string,
-            }),
+            }), // Enable Uniswap trading
         ],
     });
 
@@ -61,10 +65,12 @@ const walletClient = createWalletClient({
         console.log("RESPONSE");
         console.log("\n-------------------\n");
         try {
+            // TODO(alfonso-paella) Should we document the maxSteps parameter?
+            // What's the recommended value for different operations?
             const result = await generateText({
                 model: openai("gpt-4o-mini"),
                 tools: tools,
-                maxSteps: 10,
+                maxSteps: 10, // Maximum number of tool invocations per request
                 prompt: prompt,
                 onStepFinish: (event) => {
                     console.log(event.toolResults);
