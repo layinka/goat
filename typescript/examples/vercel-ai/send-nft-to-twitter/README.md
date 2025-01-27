@@ -11,15 +11,6 @@ The example showcases:
 - Natural language processing
 - Sepolia testnet integration
 
-## Features
-- Generate wallets for Twitter users
-- Send NFTs to Twitter addresses
-- Interactive command prompt
-- Natural language interface
-- Transaction validation
-- Crossmint wallet management
-- Error handling and reporting
-
 ## Setup
 
 1. Install dependencies:
@@ -37,17 +28,8 @@ cp .env.template .env
 - `WALLET_PRIVATE_KEY`: Your wallet's private key (with 0x prefix)
 - `RPC_PROVIDER_URL`: Sepolia RPC URL
 - `CROSSMINT_API_KEY`: Your Crossmint API key for wallet operations
-
-### Prerequisites
-1. Sepolia Network Setup
-   - Wallet with Sepolia ETH for gas
-   - Valid RPC endpoint
-   - NFTs to transfer
-
-2. Crossmint Setup
-   - Valid API key
-   - Understanding of wallet creation process
-   - Access to required endpoints
+  - Use staging key (`CROSSMINT_STAGING_API_KEY`) for development and testing
+  - Use production key (`CROSSMINT_API_KEY`) for mainnet operations
 
 ## Usage
 
@@ -72,10 +54,3 @@ Check transfer status
    - Transfer transaction details
    - Error messages
    - Operation status
-
-## Note
-- Uses GPT-4o-mini model for natural language processing
-- Connects to Sepolia testnet
-- Maximum 10 steps per interaction
-- Continuous operation until "exit" command
-- Automatic wallet creation for recipients
