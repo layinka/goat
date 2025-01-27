@@ -29,8 +29,6 @@ const walletClient = createWalletClient({
 });
 
 (async () => {
-    // TODO(alfonso-paella) Should we document the supported token types?
-    // What tokens can be added beyond USDC and PEPE?
     const tools: ToolBase[] = await getTools({
         wallet: viem(walletClient),
         plugins: [
@@ -38,9 +36,6 @@ const walletClient = createWalletClient({
             erc20({ tokens: [USDC, PEPE] }), // Enable ERC20 token operations
         ],
     });
-
-    // TODO(alfonso-paella) Should we document the schema conversion process?
-    // What are the requirements for tool parameters schema?
     const workerFunctions = tools.map((tool) => {
         // biome-ignore lint/suspicious/noExplicitAny: Fix types later
         const schema = zodToJsonSchema(tool.parameters as any, {
@@ -49,8 +44,6 @@ const walletClient = createWalletClient({
 
         const properties = Object.keys(schema.properties);
 
-        // TODO(alfonso-paella) Should we document the argument mapping process?
-        // How should descriptions be formatted for optimal agent understanding?
         const args = properties.map((property) => ({
             name: property,
             description: schema.properties[property].description ?? "",
@@ -84,8 +77,6 @@ const walletClient = createWalletClient({
         functions: [...workerFunctions],
     });
 
-    // TODO(alfonso-paella) Should we document the GameAgent configuration options?
-    // What are the recommended settings for different goals?
     const agent = new GameAgent(process.env.VIRTUALS_GAME_API_KEY as string, {
         name: "Onchain agent",
         goal: "Swap 0.01 USDC to MODE",
@@ -93,12 +84,8 @@ const walletClient = createWalletClient({
         workers: [onChainWorker],
     });
 
-    // TODO(alfonso-paella) Should we document the initialization process?
-    // What happens during agent.init() and what should users expect?
     await agent.init();
 
-    // TODO(alfonso-paella) Should we document the maxSteps parameter?
-    // What's the recommended value for different types of operations?
     await agent.run(10, {
         verbose: true, // Enable detailed execution logging
     });

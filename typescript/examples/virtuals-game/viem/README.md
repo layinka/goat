@@ -2,23 +2,6 @@
 
 This example demonstrates how to integrate GOAT with the Virtuals Protocol GAME framework using viem for Ethereum operations. It shows how to create a GameAgent that can execute on-chain actions through custom GameFunctions, specifically focusing on token swaps and transfers on the Mode network.
 
-## Overview
-The example showcases:
-- Integration with Virtuals Protocol GAME framework
-- Custom GameFunction creation from GOAT tools
-- Mode network integration
-- ERC20 token operations (USDC, PEPE)
-- ETH transfer capabilities
-- Automated agent execution
-
-## Features
-- Convert GOAT tools to GameFunctions
-- Execute on-chain actions through GameAgent
-- Handle multiple token operations
-- Automatic error handling and reporting
-- Progress tracking with verbose mode
-- Mode network compatibility
-
 ## Setup
 
 1. Install dependencies:
@@ -36,17 +19,6 @@ cp .env.template .env
 - `WALLET_PRIVATE_KEY`: Your wallet's private key (with 0x prefix)
 - `RPC_PROVIDER_URL`: Mode network RPC URL
 - `VIRTUALS_GAME_API_KEY`: Your Virtuals Protocol GAME API key
-
-### Prerequisites
-1. Mode Network Setup
-   - Wallet with MODE tokens for gas
-   - Access to Mode RPC endpoint
-   - Understanding of Mode network specifics
-
-2. Virtuals Protocol Setup
-   - Valid GAME API key
-   - Understanding of GameAgent concepts
-   - Knowledge of worker/function structure
 
 ## Usage
 
@@ -66,10 +38,3 @@ npx ts-node index.ts
    - Watch verbose output for step-by-step execution
    - Check transaction status and results
    - Review any error messages
-
-## Note
-- Uses Mode network for transactions
-- Supports USDC and PEPE token operations
-- Maximum 10 steps per agent run
-- Automatic error handling and reporting
-- Real-time execution logging
