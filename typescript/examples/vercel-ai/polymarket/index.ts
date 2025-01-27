@@ -51,7 +51,7 @@ async function main() {
                 model: openai("gpt-4o-mini"),
                 messages,
                 tools: tools,
-                maxSteps: 5
+                maxSteps: 5,
             });
 
             let fullResponse = "";
