@@ -2,23 +2,6 @@
 
 This example demonstrates how to use GOAT with Vercel AI SDK to interact with OpenSea's API. It provides a natural language interface for retrieving NFT collection statistics and recent sales information from OpenSea's marketplace.
 
-## Overview
-The example showcases:
-- OpenSea API integration
-- NFT collection statistics retrieval
-- Recent sales information fetching
-- Natural language query processing
-- Ethereum mainnet integration
-
-## Features
-- Get NFT collection statistics
-- View recent sales information
-- Natural language queries
-- Collection performance metrics
-- Sales history analysis
-- GPT-4o model integration
-- Ethereum mainnet support
-
 ## Setup
 
 1. Install dependencies:
@@ -42,11 +25,6 @@ cp .env.template .env
    - Valid OpenSea API key
    - Understanding of OpenSea's API rate limits
    - Knowledge of collection slugs/names
-
-2. Network Requirements
-   - Ethereum mainnet access
-   - Stable network connection
-   - RPC endpoint with good uptime
 
 ## Usage
 
@@ -74,10 +52,3 @@ View transaction history
    - Recent sales data
    - Volume metrics
    - Transaction details
-
-## Note
-- Uses GPT-4o-mini model for natural language processing
-- Connects to Ethereum mainnet
-- Maximum 5 steps per interaction
-- Real-time OpenSea data
-- Rate limits apply based on API key tier
