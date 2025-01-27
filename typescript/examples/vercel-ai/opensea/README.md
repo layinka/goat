@@ -2,23 +2,6 @@
 
 This example demonstrates how to use GOAT with Vercel AI SDK to interact with OpenSea's API. It provides a natural language interface for retrieving NFT collection statistics and recent sales information from OpenSea's marketplace.
 
-## Overview
-The example showcases:
-- OpenSea API integration
-- NFT collection statistics retrieval
-- Recent sales information fetching
-- Natural language query processing
-- Ethereum mainnet integration
-
-## Features
-- Get NFT collection statistics
-- View recent sales information
-- Natural language queries
-- Collection performance metrics
-- Sales history analysis
-- GPT-4o model integration
-- Ethereum mainnet support
-
 ## Setup
 
 1. Install dependencies:
@@ -37,17 +20,6 @@ cp .env.template .env
 - `RPC_PROVIDER_URL`: Ethereum RPC URL for mainnet
 - `OPENSEA_API_KEY`: Your OpenSea API key for accessing their API
 
-### Prerequisites
-1. OpenSea Setup
-   - Valid OpenSea API key
-   - Understanding of OpenSea's API rate limits
-   - Knowledge of collection slugs/names
-
-2. Network Requirements
-   - Ethereum mainnet access
-   - Stable network connection
-   - RPC endpoint with good uptime
-
 ## Usage
 
 1. Run the example:
@@ -59,13 +31,13 @@ npx ts-node index.ts
 ```
 # Collection Statistics
 Get NFT collection statistics for Nouns
-Show me recent sales from Bored Ape Yacht Club
-What's the floor price of CryptoPunks?
+Show me the floor price and volume for Bored Ape Yacht Club
+What are the total sales and average price for CryptoPunks?
 
-# Sales Analysis
-Show recent sales with prices
-Get collection volume statistics
-View transaction history
+# Recent Sales
+Show me the last 5 sales from Doodles
+Who bought and sold in recent Azuki trades?
+Get the prices of recent sales for World of Women
 ```
 
 3. Understanding responses:
@@ -74,10 +46,3 @@ View transaction history
    - Recent sales data
    - Volume metrics
    - Transaction details
-
-## Note
-- Uses GPT-4o-mini model for natural language processing
-- Connects to Ethereum mainnet
-- Maximum 5 steps per interaction
-- Real-time OpenSea data
-- Rate limits apply based on API key tier
