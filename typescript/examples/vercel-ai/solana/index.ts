@@ -30,8 +30,6 @@ type Message = {
 };
 
 async function chat() {
-    // TODO(alfonso-paella) Should we document conversation history management?
-    // How long should we keep the history? Should we implement pagination?
     const conversationHistory: Message[] = [];
     const tools = await getOnChainTools({
         wallet: solana({
@@ -45,8 +43,6 @@ async function chat() {
             coingecko({
                 apiKey: process.env.COINGECKO_API_KEY as string,
             }), // Enable market data access
-            // TODO(alfonso-paella) Should we document the PumpFun plugin capabilities?
-            // What operations are supported? Are there any specific requirements?
             pumpfun(),
         ],
     });
@@ -62,14 +58,10 @@ async function chat() {
 
             conversationHistory.push({ role: "user", content: prompt });
 
-            // TODO(alfonso-paella) Should we document the maxSteps parameter?
-            // What's the recommended value for different Solana operations?
             const result = await generateText({
                 model: openai("gpt-4o-mini"),
                 tools: tools,
                 maxSteps: 10, // Maximum number of tool invocations per request
-                // TODO(alfonso-paella) Should we document the AI personality configuration?
-                // What's the recommended tone and knowledge scope for the assistant?
                 prompt: `You are a based crypto degen assistant. You're knowledgeable about DeFi, NFTs, and trading. You use crypto slang naturally and stay up to date with Solana ecosystem. You help users with their trades and provide market insights. Keep responses concise and use emojis occasionally.
 
 Previous conversation:
