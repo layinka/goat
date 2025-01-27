@@ -2,24 +2,6 @@
 
 This example demonstrates how to use GOAT with Vercel AI SDK to send NFTs to Twitter users by automatically generating Crossmint wallets. It provides a natural language interface for NFT transfers, handling wallet creation and NFT sending in a single interaction.
 
-## Overview
-The example showcases:
-- Automatic wallet generation for Twitter users
-- NFT transfer capabilities
-- Crossmint wallet integration
-- Interactive CLI interface
-- Natural language processing
-- Sepolia testnet integration
-
-## Features
-- Generate wallets for Twitter users
-- Send NFTs to Twitter addresses
-- Interactive command prompt
-- Natural language interface
-- Transaction validation
-- Crossmint wallet management
-- Error handling and reporting
-
 ## Setup
 
 1. Install dependencies:
@@ -37,17 +19,15 @@ cp .env.template .env
 - `WALLET_PRIVATE_KEY`: Your wallet's private key (with 0x prefix)
 - `RPC_PROVIDER_URL`: Sepolia RPC URL
 - `CROSSMINT_API_KEY`: Your Crossmint API key for wallet operations
+  - Use staging key (`CROSSMINT_STAGING_API_KEY`) for development and testing
+  - Use production key (`CROSSMINT_API_KEY`) for mainnet operations
 
-### Prerequisites
-1. Sepolia Network Setup
-   - Wallet with Sepolia ETH for gas
-   - Valid RPC endpoint
-   - NFTs to transfer
+### Crossmint Integration
+This example uses two main Crossmint plugins:
+1. `wallets()`: Creates and manages custodial wallets for Twitter users
+2. `mint()`: Handles NFT minting and transfer operations to Crossmint wallets
 
-2. Crossmint Setup
-   - Valid API key
-   - Understanding of wallet creation process
-   - Access to required endpoints
+
 
 ## Usage
 
@@ -72,10 +52,3 @@ Check transfer status
    - Transfer transaction details
    - Error messages
    - Operation status
-
-## Note
-- Uses GPT-4o-mini model for natural language processing
-- Connects to Sepolia testnet
-- Maximum 10 steps per interaction
-- Continuous operation until "exit" command
-- Automatic wallet creation for recipients

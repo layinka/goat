@@ -23,16 +23,12 @@ const walletClient = createWalletClient({
     chain: sepolia,
 });
 
-// TODO(alfonso-paella) Should we document the Crossmint API key requirements?
-// Is there a difference between staging and production keys?
 const apiKey = process.env.CROSSMINT_STAGING_API_KEY;
 
 if (!apiKey) {
     throw new Error("Missing Crossmint API key");
 }
 
-// TODO(alfonso-paella) Should we document the available Crossmint plugins?
-// What operations are supported by wallets() and mint()?
 const { wallets, mint } = crossmint(apiKey);
 
 (async () => {
@@ -57,8 +53,6 @@ const { wallets, mint } = crossmint(apiKey);
         }
 
         try {
-            // TODO(alfonso-paella) Should we document the maxSteps parameter?
-            // What's the recommended value for NFT transfer operations?
             const result = await generateText({
                 model: openai("gpt-4o-mini"),
                 tools: tools,
