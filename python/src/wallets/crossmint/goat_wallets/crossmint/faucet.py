@@ -2,7 +2,7 @@ from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
 
 from .parameters import RequestFaucetTokensParameters
-from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
+from .api_client import CrossmintWalletsAPI
 
 
 class CrossmintFaucetService:
