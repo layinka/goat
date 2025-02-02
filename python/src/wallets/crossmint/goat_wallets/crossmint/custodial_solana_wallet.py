@@ -1,11 +1,10 @@
-import asyncio
+import time
 from typing import Dict
 import base58
 from solders.instruction import Instruction
-from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 from solders.message import Message
-from solana.rpc.async_api import AsyncClient as AsyncSolanaClient
+from solana.rpc.api import Client as SolanaClient
 from goat.classes.wallet_client_base import Balance, Signature
 from goat_wallets.solana import SolanaWalletClient, SolanaTransaction
 from .api_client import CrossmintWalletsAPI
@@ -29,7 +28,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         self,
         address: str,
         api_client: CrossmintWalletsAPI,
-        connection: AsyncSolanaClient,
+        connection: SolanaClient,
         options: Dict
     ):
         """Initialize custodial wallet client.
@@ -50,7 +49,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         """Get wallet address."""
         return self._address
     
-    async def sign_message(self, message: str) -> Signature:
+    def sign_message(self, message: str) -> Signature:
         """Sign a message with the wallet's private key.
         
         Args:
@@ -60,13 +59,13 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             Signature object containing the signature
         """
         try:
-            response = await self._client.sign_message_for_custodial_wallet(
+            response = self._client.sign_message_for_custodial_wallet(
                 self._locator,
                 message
             )
             
             while True:
-                status = await self._client.check_signature_status(
+                status = self._client.check_signature_status(
                     response["id"],
                     self._address
                 )
@@ -79,12 +78,12 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
                 if status["status"] == "failed":
                     raise ValueError("Signature failed")
                 
-                await asyncio.sleep(3)  # Wait 3 seconds before checking again
+                time.sleep(3)  # Wait 3 seconds before checking again
                 
         except Exception as e:
             raise ValueError(f"Failed to sign message: {e}")
     
-    async def send_transaction(self, transaction: SolanaTransaction) -> Dict[str, str]:
+    def send_transaction(self, transaction: SolanaTransaction) -> Dict[str, str]:
         """Send a transaction on the Solana chain.
         
         Args:
@@ -95,12 +94,12 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         """
         # Convert instructions to solders Instructions
         instructions = []
-        for instruction_dict in transaction["instructions"]:
+        for instruction in transaction["instructions"]:
             # Convert dictionary to solders Instruction
             instruction = Instruction(
-                program_id=instruction_dict["program_id"],
-                accounts=instruction_dict["accounts"],
-                data=instruction_dict["data"]
+                program_id=instruction.program_id,
+                accounts=instruction.accounts,
+                data=instruction.data
             )
             instructions.append(instruction)
         
@@ -108,21 +107,20 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         message = Message(
             instructions=instructions,
             payer=Pubkey.from_string(self._address),
-            recent_blockhash=str(Pubkey.default())  # Placeholder
         )
         
         # Serialize and encode transaction
         serialized = base58.b58encode(bytes(message)).decode()
         
         # Create and submit transaction
-        response = await self._client.create_transaction_for_custodial_wallet(
+        response = self._client.create_transaction_for_custodial_wallet(
             self._locator,
             serialized
         )
         
         # Wait for completion
         while True:
-            status = await self._client.check_transaction_status(
+            status = self._client.check_transaction_status(
                 self._locator,
                 response["id"]
             )
@@ -137,9 +135,9 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
                     f"Transaction failed: {status.get('onChain', {}).get('txId')}"
                 )
             
-            await asyncio.sleep(3)
+            time.sleep(3)
     
-    async def balance_of(self, address: str) -> Balance:
+    def balance_of(self, address: str) -> Balance:
         """Get the SOL balance of an address.
         
         Args:
@@ -149,23 +147,55 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             Balance object containing token information and value
         """
         pubkey = Pubkey.from_string(address)
-        balance = await self.connection.get_balance(pubkey)
+        balance = self.connection.get_balance(pubkey)
         
         return Balance(
-            value=str(balance / 10**9),
-            in_base_units=str(balance),
+            value=str(balance.value / 10**9),
+            in_base_units=str(balance.value),
             decimals=9,
             symbol="SOL",
             name="Solana"
         )
 
+    def send_raw_transaction(self, transaction: str) -> Dict[str, str]:
+        """Send a raw transaction on the Solana chain.
+        
+        Args:
+            transaction: Base58 encoded transaction
+            
+        Returns:
+            Dict containing the transaction hash
+        """
+        response = self._client.create_transaction_for_custodial_wallet(
+            self._locator,
+            transaction
+        )
+        
+        while True:
+            status = self._client.check_transaction_status(
+                self._locator,
+                response["id"]
+            )
+            
+            if status["status"] == "success":
+                return {
+                    "hash": status.get("onChain", {}).get("txId", "")
+                }
+            
+            if status["status"] == "failed":
+                raise ValueError(
+                    f"Transaction failed: {status.get('onChain', {}).get('txId')}"
+                )
+            
+            time.sleep(3)
+
 
 def custodial_factory(api_client: CrossmintWalletsAPI):
     """Factory function to create custodial wallet instances."""
-    async def create_custodial(options: Dict) -> CustodialSolanaWalletClient:
+    def create_custodial(options: Dict) -> CustodialSolanaWalletClient:
         """Create a new custodial wallet instance."""
         locator = get_locator(options)
-        wallet = await api_client.get_wallet(locator)
+        wallet = api_client.get_wallet(locator)
         
         return CustodialSolanaWalletClient(
             wallet["address"],

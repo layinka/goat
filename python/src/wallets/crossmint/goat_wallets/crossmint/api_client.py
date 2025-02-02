@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-import aiohttp
+import requests
 from pydantic import BaseModel
 import json
 from urllib.parse import quote
@@ -49,13 +49,13 @@ class CrossmintWalletsAPI:
         self.api_key = api_key
         self.base_url = f"{base_url}/api/v1-alpha2"
     
-    async def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
+    def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
         """Make an HTTP request to the Crossmint API.
         
         Args:
             endpoint: API endpoint (relative to base_url)
             method: HTTP method to use
-            **kwargs: Additional arguments to pass to aiohttp
+            **kwargs: Additional arguments to pass to requests
         
         Returns:
             Parsed JSON response
@@ -71,21 +71,20 @@ class CrossmintWalletsAPI:
         }
         
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.request(method, url, headers=headers, **kwargs) as response:
-                    response_body = await response.json()
-                    
-                    if not response.ok:
-                        error_message = f"Error {response.status}: {response.reason}"
-                        if response_body:
-                            error_message += f"\n\n{json.dumps(response_body, indent=2)}"
-                        raise Exception(error_message)
-                    
-                    return response_body
+            response = requests.request(method, url, headers=headers, **kwargs)
+            response_body = response.json()
+            
+            if not response.ok:
+                error_message = f"Error {response.status_code}: {response.reason}"
+                if response_body:
+                    error_message += f"\n\n{json.dumps(response_body, indent=2)}"
+                raise Exception(error_message)
+                
+            return response_body
         except Exception as e:
             raise Exception(f"Failed to {method.lower()} {endpoint}: {e}")
     
-    async def create_smart_wallet(self, admin_signer: Optional[AdminSigner] = None) -> Dict[str, Any]:
+    def create_smart_wallet(self, admin_signer: Optional[AdminSigner] = None) -> Dict[str, Any]:
         """Create a new EVM smart wallet.
         
         Args:
@@ -101,9 +100,9 @@ class CrossmintWalletsAPI:
             }
         }
         
-        return await self._request("/wallets", method="POST", json=payload)
+        return self._request("/wallets", method="POST", json=payload)
     
-    async def create_custodial_wallet(self, linked_user: str) -> Dict[str, Any]:
+    def create_custodial_wallet(self, linked_user: str) -> Dict[str, Any]:
         """Create a new Solana custodial wallet.
         
         Args:
@@ -117,9 +116,9 @@ class CrossmintWalletsAPI:
             "linkedUser": linked_user
         }
         
-        return await self._request("/wallets", method="POST", json=payload)
+        return self._request("/wallets", method="POST", json=payload)
     
-    async def get_wallet(self, locator: str) -> Dict[str, Any]:
+    def get_wallet(self, locator: str) -> Dict[str, Any]:
         """Get wallet details by locator.
         
         Args:
@@ -129,9 +128,9 @@ class CrossmintWalletsAPI:
             Wallet details
         """
         endpoint = f"/wallets/{quote(locator)}"
-        return await self._request(endpoint)
+        return self._request(endpoint)
     
-    async def sign_message_for_custodial_wallet(
+    def sign_message_for_custodial_wallet(
         self, locator: str, message: str
     ) -> Dict[str, Any]:
         """Sign a message using a Solana custodial wallet.
@@ -149,9 +148,9 @@ class CrossmintWalletsAPI:
             "params": {"message": message}
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def sign_message_for_smart_wallet(
+    def sign_message_for_smart_wallet(
         self,
         wallet_address: str,
         message: str,
@@ -179,9 +178,9 @@ class CrossmintWalletsAPI:
             }
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def sign_typed_data_for_smart_wallet(
+    def sign_typed_data_for_smart_wallet(
         self,
         wallet_address: str,
         typed_data: EVMTypedData,
@@ -209,9 +208,9 @@ class CrossmintWalletsAPI:
             }
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
 
-    async def check_signature_status(
+    def check_signature_status(
         self, signature_id: str, wallet_address: str
     ) -> Dict[str, Any]:
         """Check the status of a signature request.
@@ -224,9 +223,9 @@ class CrossmintWalletsAPI:
             Signature status response
         """
         endpoint = f"/wallets/{quote(wallet_address)}/signatures/{quote(signature_id)}"
-        return await self._request(endpoint)
+        return self._request(endpoint)
     
-    async def approve_signature_for_smart_wallet(
+    def approve_signature_for_smart_wallet(
         self,
         signature_id: str,
         locator: str,
@@ -252,9 +251,9 @@ class CrossmintWalletsAPI:
             }]
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def create_transaction_for_custodial_wallet(
+    def create_transaction_for_custodial_wallet(
         self, locator: str, transaction: str
     ) -> Dict[str, Any]:
         """Create a transaction using a Solana custodial wallet.
@@ -273,9 +272,9 @@ class CrossmintWalletsAPI:
             }
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def create_transaction_for_smart_wallet(
+    def create_transaction_for_smart_wallet(
         self,
         wallet_address: str,
         calls: List[Call],
@@ -302,9 +301,9 @@ class CrossmintWalletsAPI:
             }
         }
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def approve_transaction(
+    def approve_transaction(
         self,
         locator: str,
         transaction_id: str,
@@ -323,9 +322,9 @@ class CrossmintWalletsAPI:
         endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}/approvals"
         payload = {"approvals": approvals}
         
-        return await self._request(endpoint, method="POST", json=payload)
+        return self._request(endpoint, method="POST", json=payload)
     
-    async def check_transaction_status(
+    def check_transaction_status(
         self, locator: str, transaction_id: str
     ) -> Dict[str, Any]:
         """Check the status of a transaction.
@@ -338,4 +337,4 @@ class CrossmintWalletsAPI:
             Transaction status response
         """
         endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}"
-        return await self._request(endpoint)
+        return self._request(endpoint)
