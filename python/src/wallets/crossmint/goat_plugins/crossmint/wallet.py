@@ -13,7 +13,16 @@ from .parameters import (
     CreateWalletForTwitterUserParameters,
     CreateWalletForEmailParameters,
     GetWalletByTwitterUsernameParameters,
-    GetWalletByEmailParameters
+    GetWalletByEmailParameters,
+    GetWalletParameters,
+    SignMessageCustodialParameters,
+    SignMessageSmartParameters,
+    SignTypedDataSmartParameters,
+    CheckSignatureStatusParameters,
+    CreateTransactionCustodialParameters,
+    CreateTransactionSmartParameters,
+    ApproveTransactionParameters,
+    CheckTransactionStatusParameters
 )
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
@@ -46,9 +55,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Get wallet details by locator",
-        "parameters_schema": {"type": "object", "properties": {"locator": {"type": "string"}}}
+        "parameters_schema": GetWalletParameters
     })
-    def get_wallet(self, wallet_client: EVMWalletClient, parameters: dict) -> WalletResponse:
+    def get_wallet(self, wallet_client: EVMWalletClient, parameters: GetWalletParameters) -> WalletResponse:
         try:
             response = self.api_client.get_wallet(parameters["locator"])
             return WalletResponse(**response)
@@ -57,12 +66,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Sign a message using a Solana custodial wallet",
-        "parameters_schema": {"type": "object", "properties": {
-            "locator": {"type": "string"},
-            "message": {"type": "string"}
-        }}
+        "parameters_schema": SignMessageCustodialParameters
     })
-    def sign_message_custodial(self, wallet_client: SolanaWalletClient, parameters: dict) -> SignatureResponse:
+    def sign_message_custodial(self, wallet_client: SolanaWalletClient, parameters: SignMessageCustodialParameters) -> SignatureResponse:
         try:
             response = self.api_client.sign_message_for_custodial_wallet(
                 parameters["locator"],
@@ -74,14 +80,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Sign a message using an EVM smart wallet",
-        "parameters_schema": {"type": "object", "properties": {
-            "wallet_address": {"type": "string"},
-            "message": {"type": "string"},
-            "chain": {"type": "string"},
-            "signer": {"type": "string", "optional": True}
-        }}
+        "parameters_schema": SignMessageSmartParameters
     })
-    def sign_message_smart(self, wallet_client: EVMWalletClient, parameters: dict) -> SignatureResponse:
+    def sign_message_smart(self, wallet_client: EVMWalletClient, parameters: SignMessageSmartParameters) -> SignatureResponse:
         try:
             response = self.api_client.sign_message_for_smart_wallet(
                 parameters["wallet_address"],
@@ -95,14 +96,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Sign typed data using an EVM smart wallet",
-        "parameters_schema": {"type": "object", "properties": {
-            "wallet_address": {"type": "string"},
-            "typed_data": {"type": "object"},
-            "chain": {"type": "string"},
-            "signer": {"type": "string"}
-        }}
+        "parameters_schema": SignTypedDataSmartParameters
     })
-    def sign_typed_data_smart(self, wallet_client: EVMWalletClient, parameters: dict) -> SignatureResponse:
+    def sign_typed_data_smart(self, wallet_client: EVMWalletClient, parameters: SignTypedDataSmartParameters) -> SignatureResponse:
         try:
             response = self.api_client.sign_typed_data_for_smart_wallet(
                 parameters["wallet_address"],
@@ -116,12 +112,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Check signature status",
-        "parameters_schema": {"type": "object", "properties": {
-            "signature_id": {"type": "string"},
-            "wallet_address": {"type": "string"}
-        }}
+        "parameters_schema": CheckSignatureStatusParameters
     })
-    def check_signature_status(self, wallet_client: EVMWalletClient, parameters: dict) -> SignatureResponse:
+    def check_signature_status(self, wallet_client: EVMWalletClient, parameters: CheckSignatureStatusParameters) -> SignatureResponse:
         try:
             response = self.api_client.check_signature_status(
                 parameters["signature_id"],
@@ -133,12 +126,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Create a transaction using a Solana custodial wallet",
-        "parameters_schema": {"type": "object", "properties": {
-            "locator": {"type": "string"},
-            "transaction": {"type": "string"}
-        }}
+        "parameters_schema": CreateTransactionCustodialParameters
     })
-    def create_transaction_custodial(self, wallet_client: SolanaWalletClient, parameters: dict) -> TransactionResponse:
+    def create_transaction_custodial(self, wallet_client: SolanaWalletClient, parameters: CreateTransactionCustodialParameters) -> TransactionResponse:
         try:
             response = self.api_client.create_transaction_for_custodial_wallet(
                 parameters["locator"],
@@ -150,14 +140,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Create a transaction using an EVM smart wallet",
-        "parameters_schema": {"type": "object", "properties": {
-            "wallet_address": {"type": "string"},
-            "calls": {"type": "array", "items": {"$ref": "#/definitions/Call"}},
-            "chain": {"type": "string"},
-            "signer": {"type": "string", "optional": True}
-        }}
+        "parameters_schema": CreateTransactionSmartParameters
     })
-    def create_transaction_smart(self, wallet_client: EVMWalletClient, parameters: dict) -> TransactionResponse:
+    def create_transaction_smart(self, wallet_client: EVMWalletClient, parameters: CreateTransactionSmartParameters) -> TransactionResponse:
         try:
             response = self.api_client.create_transaction_for_smart_wallet(
                 parameters["wallet_address"],
@@ -171,19 +156,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Approve a transaction",
-        "parameters_schema": {"type": "object", "properties": {
-            "locator": {"type": "string"},
-            "transaction_id": {"type": "string"},
-            "approvals": {"type": "array", "items": {
-                "type": "object",
-                "properties": {
-                    "signer": {"type": "string"},
-                    "signature": {"type": "string"}
-                }
-            }}
-        }}
+        "parameters_schema": ApproveTransactionParameters
     })
-    def approve_transaction(self, wallet_client: EVMWalletClient, parameters: dict) -> TransactionResponse:
+    def approve_transaction(self, wallet_client: EVMWalletClient, parameters: ApproveTransactionParameters) -> TransactionResponse:
         try:
             response = self.api_client.approve_transaction(
                 parameters["locator"],
@@ -196,12 +171,9 @@ class CrossmintWalletService:
 
     @Tool({
         "description": "Check transaction status",
-        "parameters_schema": {"type": "object", "properties": {
-            "locator": {"type": "string"},
-            "transaction_id": {"type": "string"}
-        }}
+        "parameters_schema": CheckTransactionStatusParameters
     })
-    def check_transaction_status(self, wallet_client: EVMWalletClient, parameters: dict) -> TransactionResponse:
+    def check_transaction_status(self, wallet_client: EVMWalletClient, parameters: CheckTransactionStatusParameters) -> TransactionResponse:
         try:
             response = self.api_client.check_transaction_status(
                 parameters["locator"],
