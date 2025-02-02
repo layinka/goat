@@ -120,3 +120,80 @@ class TransactionResponse(BaseModel):
     params: TransactionParams
     on_chain: Optional[Dict[str, Any]] = None
     created_at: str
+
+
+class CollectionMetadata(BaseModel):
+    name: str = Field(description="The name of the collection")
+    description: str = Field(description="A description of the NFT collection")
+    image: Optional[str] = Field(None, description="URL pointing to an image that represents the collection")
+    symbol: Optional[str] = Field(None, description="Shorthand identifier for the NFT collection (Max length: 10)")
+
+
+class CollectionParameters(BaseModel):
+    metadata: CollectionMetadata = Field(
+        default=CollectionMetadata(
+            name="My first Minting API Collection",
+            description="An NFT Collection created with the Crossmint Minting API",
+            image="https://www.crossmint.com/assets/crossmint/logo.png"
+        ),
+        description="The metadata of the collection"
+    )
+    fungibility: Literal["semi-fungible", "non-fungible"] = Field(
+        default="non-fungible",
+        description="Whether or not this collection is fungible"
+    )
+    transferable: bool = Field(
+        default=True,
+        description="Whether or not the NFTs in this collection are transferable"
+    )
+
+
+class NFTAttribute(BaseModel):
+    display_type: Literal["number", "boost_number", "boost_percentage"]
+    value: str
+
+
+class NFTMetadata(BaseModel):
+    name: str = Field(description="The name of the NFT")
+    description: str = Field(description="The description of the NFT")
+    image: str = Field(description="URL pointing to the NFT image")
+    animation_url: Optional[str] = Field(None, description="URL pointing to the NFT animation")
+    attributes: Optional[List[NFTAttribute]] = Field(None, description="The attributes of the NFT")
+
+
+class MintNFTParameters(BaseModel):
+    collection_id: str = Field(description="The ID of the collection to mint the NFT in")
+    recipient: str = Field(description="The recipient of the NFT")
+    recipient_type: Literal["wallet", "email"] = Field(
+        default="email",
+        description="The type of the recipient"
+    )
+    metadata: NFTMetadata = Field(description="The metadata of the NFT")
+
+
+class CreateWalletForTwitterUserParameters(BaseModel):
+    """Parameters for creating a wallet for a Twitter user."""
+    username: str = Field(description="The username of the Twitter / X user")
+    chain: Literal["evm", "solana", "aptos", "cardano", "sui"] = Field(
+        description="The chain of the wallet"
+    )
+
+
+class CreateWalletForEmailParameters(BaseModel):
+    """Parameters for creating a wallet for an email user."""
+    email: str = Field(description="The email address of the user")
+    chain: Literal["evm", "solana", "aptos", "cardano", "sui"] = Field(
+        description="The chain of the wallet"
+    )
+
+
+class GetWalletByTwitterUsernameParameters(BaseModel):
+    """Parameters for retrieving a wallet by Twitter username."""
+    username: str = Field(description="The username of the Twitter / X user")
+    chain: str = Field(description="The chain of the wallet")
+
+
+class GetWalletByEmailParameters(BaseModel):
+    """Parameters for retrieving a wallet by email."""
+    email: str = Field(description="The email address of the user")
+    chain: str = Field(description="The chain of the wallet")
