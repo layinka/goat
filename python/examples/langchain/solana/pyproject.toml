@@ -20,10 +20,10 @@ solana = {version = "^0.30.2", extras = ["spl"]}
 solders = "^0.18.0"
 anchorpy = "^0.18.0"
 goat-sdk = "*"
-goat-sdk-wallet-solana = {path = "../../../src/wallets/solana", develop = true}
-goat-sdk-wallet-crossmint = { path = "../../../src/wallets/crossmint", develop = true }
-goat-sdk-adapter-langchain = { path = "../../../src/adapters/langchain", develop = true }
-goat-sdk-plugin-spl-token = { path = "../../../src/plugins/spl_token", develop = true }
+goat-sdk-wallet-solana = "*"
+goat-sdk-adapter-langchain = "*"
+goat-sdk-plugin-spl-token = "^0.1.0"
+goat-sdk-plugin-jupiter = "^0.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
@@ -48,6 +48,7 @@ ruff = "^0.8.6"
 goat-sdk = { path = "../../../src/goat-sdk", develop = true }
 goat-sdk-wallet-solana = { path = "../../../src/wallets/solana", develop = true }
 goat-sdk-adapter-langchain = { path = "../../../src/adapters/langchain", develop = true }
+goat-sdk-plugin-jupiter = { path = "../../../src/plugins/jupiter", develop = true }
 
 [tool.ruff]
 line-length = 120

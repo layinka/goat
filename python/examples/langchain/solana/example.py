@@ -13,7 +13,7 @@ from solders.keypair import Keypair
 
 from goat_adapters.langchain import get_on_chain_tools
 from goat_wallets.solana import solana
-from goat_wallets.crossmint import custodial_factory
+from goat_plugins.jupiter import jupiter, JupiterPluginOptions
 from goat_plugins.spl_token import spl_token, SplTokenPluginOptions
 from goat_plugins.spl_token.tokens import SPL_TOKENS
 from goat_wallets.crossmint.api_client import CrossmintWalletsAPI
@@ -25,23 +25,10 @@ client = SolanaClient(os.getenv("SOLANA_RPC_ENDPOINT"))
 keypair = Keypair.from_base58_string(os.getenv("SOLANA_WALLET_SEED") or "")
 wallet = solana(client, keypair)
 
-# Initialize Crossmint custodial wallet
-async def init_crossmint_wallet():
-    crossmint_api = CrossmintWalletsAPI(os.getenv("CROSSMINT_API_KEY"))
-    crossmint_wallet_factory = custodial_factory(crossmint_api)
-    return await crossmint_wallet_factory({
-        "chain": "solana",
-        "connection": client,
-        "email": os.getenv("CROSSMINT_USER_EMAIL")
-    })
-
 # Initialize LLM
 llm = ChatOpenAI(model="gpt-4o-mini")
 
-
 async def main():
-    # Initialize Crossmint wallet
-    crossmint_wallet = await init_crossmint_wallet()
     
     # Get the prompt template
     prompt = ChatPromptTemplate.from_messages(
@@ -53,17 +40,16 @@ async def main():
         ]
     )
 
-    # Initialize SPL Token plugin
-    spl_token_plugin = spl_token(SplTokenPluginOptions(
-        network="devnet",  # Using devnet as specified in .env
-        tokens=SPL_TOKENS
-    ))
-
-    # Initialize tools with both wallets
-    # Use regular Solana wallet by default
+    # Initialize tools with Solana wallet
     tools = get_on_chain_tools(
         wallet=wallet,
-        plugins=[spl_token_plugin]
+        plugins=[
+            jupiter(JupiterPluginOptions()),  # No options needed for Jupiter v6
+            spl_token(SplTokenPluginOptions(
+                network="mainnet",  # Using devnet as specified in .env
+                tokens=SPL_TOKENS
+            )),
+        ],
     )
     
     # Example of using Crossmint wallet instead:
