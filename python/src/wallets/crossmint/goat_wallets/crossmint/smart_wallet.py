@@ -388,8 +388,18 @@ class SmartWalletClient(EVMWalletClient):
 
 def smart_wallet_factory(api_client: CrossmintWalletsAPI):
     """Factory function to create smart wallet instances."""
-    async def create_smart_wallet(options: Dict) -> SmartWalletClient:
-        """Create a new smart wallet instance."""
+    def create_smart_wallet(options: Dict) -> SmartWalletClient:
+        """Create a new smart wallet instance.
+        
+        Args:
+            options: Dictionary containing:
+                - address (optional): Wallet address
+                - linkedUser (optional): User info (email/phone/userId)
+                - chain: Chain identifier
+                - signer: Signer configuration
+                - provider: RPC provider URL
+                - options (optional): Additional options like ensProvider
+        """
         locator = get_locator(options.get("address"), options.get("linkedUser"))
         wallet = api_client.get_wallet(locator)
         
