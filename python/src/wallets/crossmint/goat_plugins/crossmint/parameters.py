@@ -131,21 +131,15 @@ class CollectionMetadata(BaseModel):
 
 class CollectionParameters(BaseModel):
     metadata: CollectionMetadata = Field(
-        default=CollectionMetadata(
+        default_factory=lambda: CollectionMetadata(
             name="My first Minting API Collection",
             description="An NFT Collection created with the Crossmint Minting API",
-            image="https://www.crossmint.com/assets/crossmint/logo.png"
-        ),
-        description="The metadata of the collection"
+            image="https://www.crossmint.com/assets/crossmint/logo.png",
+            symbol=None
+        )
     )
-    fungibility: Literal["semi-fungible", "non-fungible"] = Field(
-        default="non-fungible",
-        description="Whether or not this collection is fungible"
-    )
-    transferable: bool = Field(
-        default=True,
-        description="Whether or not the NFTs in this collection are transferable"
-    )
+    fungibility: Literal["semi-fungible", "non-fungible"] = Field(default="non-fungible")
+    transferable: bool = Field(default=True)
 
 
 class NFTAttribute(BaseModel):

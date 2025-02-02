@@ -17,3 +17,6 @@ class MintPlugin(PluginBase):
         # Following TypeScript implementation's chain support logic
         supported_chain_ids = [1, 5, 137, 80001, 43114, 43113]  # Mainnet, Goerli, Polygon, Mumbai, Avalanche, Fuji
         return chain_id in supported_chain_ids
+
+def mint_plugin(client: CrossmintWalletsAPI) -> MintPlugin:
+    return MintPlugin(client)
