@@ -50,12 +50,6 @@ def main():
             )),
         ],
     )
-    
-    # Example of using Crossmint wallet instead:
-    # tools = get_on_chain_tools(
-    #     wallet=crossmint_wallet,
-    #     plugins=[spl_token_plugin]
-    # )
 
     agent = create_tool_calling_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(
