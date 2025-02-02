@@ -16,7 +16,6 @@ from goat_wallets.solana import solana
 from goat_plugins.jupiter import jupiter, JupiterPluginOptions
 from goat_plugins.spl_token import spl_token, SplTokenPluginOptions
 from goat_plugins.spl_token.tokens import SPL_TOKENS
-from goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
 # Initialize Solana client
 client = SolanaClient(os.getenv("SOLANA_RPC_ENDPOINT"))
@@ -28,7 +27,7 @@ wallet = solana(client, keypair)
 # Initialize LLM
 llm = ChatOpenAI(model="gpt-4o-mini")
 
-async def main():
+def main():
     
     # Get the prompt template
     prompt = ChatPromptTemplate.from_messages(
@@ -83,4 +82,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
