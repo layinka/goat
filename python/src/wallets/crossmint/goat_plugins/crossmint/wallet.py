@@ -1,7 +1,6 @@
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
 from goat_wallets.solana import SolanaWalletClient
-from typing import Dict, List
 
 from .parameters import (
     CreateSmartWalletParameters,

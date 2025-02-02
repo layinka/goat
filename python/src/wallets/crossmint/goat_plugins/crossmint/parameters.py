@@ -269,3 +269,8 @@ class CheckTransactionStatusParameters(BaseModel):
     """Parameters for checking transaction status."""
     locator: str = Field(description="The wallet locator")
     transaction_id: str = Field(description="The transaction ID")
+
+
+class EmptyParameters(BaseModel):
+    """Empty parameter schema for endpoints that take no parameters."""
+    pass
