@@ -197,3 +197,75 @@ class GetWalletByEmailParameters(BaseModel):
     """Parameters for retrieving a wallet by email."""
     email: str = Field(description="The email address of the user")
     chain: str = Field(description="The chain of the wallet")
+
+
+class RequestFaucetTokensParameters(BaseModel):
+    """Parameters for requesting tokens from faucet."""
+    wallet_address: str = Field(description="The wallet address to receive tokens")
+    chain_id: str = Field(description="The chain ID for the faucet request")
+
+
+class GetWalletParameters(BaseModel):
+    """Parameters for retrieving wallet details."""
+    locator: str = Field(description="The wallet locator")
+
+
+class SignMessageCustodialParameters(BaseModel):
+    """Parameters for signing a message with a custodial wallet."""
+    locator: str = Field(description="The wallet locator")
+    message: str = Field(description="The message to sign")
+
+
+class SignMessageSmartParameters(BaseModel):
+    """Parameters for signing a message with a smart wallet."""
+    wallet_address: str = Field(description="The wallet address")
+    message: str = Field(description="The message to sign")
+    chain: str = Field(description="The chain of the wallet")
+    signer: Optional[str] = Field(None, description="Optional signer address")
+
+
+class SignTypedDataSmartParameters(BaseModel):
+    """Parameters for signing typed data with a smart wallet."""
+    wallet_address: str = Field(description="The wallet address")
+    typed_data: Dict[str, Any] = Field(description="The typed data to sign")
+    chain: str = Field(description="The chain of the wallet")
+    signer: str = Field(description="The signer address")
+
+
+class CheckSignatureStatusParameters(BaseModel):
+    """Parameters for checking signature status."""
+    signature_id: str = Field(description="The ID of the signature")
+    wallet_address: str = Field(description="The wallet address")
+
+
+class CreateTransactionCustodialParameters(BaseModel):
+    """Parameters for creating a transaction with a custodial wallet."""
+    locator: str = Field(description="The wallet locator")
+    transaction: str = Field(description="The transaction data")
+
+
+class CreateTransactionSmartParameters(BaseModel):
+    """Parameters for creating a transaction with a smart wallet."""
+    wallet_address: str = Field(description="The wallet address")
+    calls: List[Call] = Field(description="The transaction calls")
+    chain: str = Field(description="The chain of the wallet")
+    signer: Optional[str] = Field(None, description="Optional signer address")
+
+
+class ApprovalItem(BaseModel):
+    """Structure for individual approval items."""
+    signer: str = Field(description="The signer address")
+    signature: str = Field(description="The signature")
+
+
+class ApproveTransactionParameters(BaseModel):
+    """Parameters for approving a transaction."""
+    locator: str = Field(description="The wallet locator")
+    transaction_id: str = Field(description="The transaction ID")
+    approvals: List[ApprovalItem] = Field(description="List of transaction approvals")
+
+
+class CheckTransactionStatusParameters(BaseModel):
+    """Parameters for checking transaction status."""
+    locator: str = Field(description="The wallet locator")
+    transaction_id: str = Field(description="The transaction ID")
