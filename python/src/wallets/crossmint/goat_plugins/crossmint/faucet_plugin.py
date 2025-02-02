@@ -19,3 +19,6 @@ class FaucetPlugin(PluginBase):
         # Following TypeScript implementation's chain support logic
         supported_chain_ids = [5, 80001, 43113]  # Goerli, Mumbai, Fuji
         return chain_id in supported_chain_ids
+
+def faucet_plugin(client: CrossmintWalletsAPI) -> FaucetPlugin:
+    return FaucetPlugin(client)
