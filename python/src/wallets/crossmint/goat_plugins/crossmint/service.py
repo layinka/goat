@@ -15,7 +15,18 @@ from .parameters import (
     CreateWalletForTwitterUserParameters,
     CreateWalletForEmailParameters,
     GetWalletByTwitterUsernameParameters,
-    GetWalletByEmailParameters
+    GetWalletByEmailParameters,
+    RequestFaucetTokensParameters,
+    GetWalletParameters,
+    SignMessageCustodialParameters,
+    SignMessageSmartParameters,
+    SignTypedDataSmartParameters,
+    CheckSignatureStatusParameters,
+    CreateTransactionCustodialParameters,
+    CreateTransactionSmartParameters,
+    ApproveTransactionParameters,
+    CheckTransactionStatusParameters,
+    EmptyParameters
 )
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
