@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Literal
 
 
 class CoreSignerType(str, Enum):
@@ -97,7 +97,7 @@ class SignMessageRequest(BaseModel):
 
 class SignTypedDataRequest(BaseModel):
     """Request parameters for typed data signing."""
-    type: str = Field(default="evm-typed-data", const=True)
+    type: Literal["evm-typed-data"]
     params: Dict[str, Any] = Field(description="Parameters including typed data and chain")
 
 
