@@ -1,6 +1,7 @@
 import os
 import asyncio
 from dotenv import load_dotenv
+from goat_wallets.crossmint.smart_wallet import smart_wallet_factory
 
 # Load environment variables
 load_dotenv()
@@ -20,12 +21,20 @@ from goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 # Initialize Solana client
 client = SolanaClient(os.getenv("SOLANA_RPC_ENDPOINT"))
 
-crossmint_api = CrossmintWalletsAPI(os.getenv("CROSSMINT_API_KEY"))
-crossmint_wallet_factory = custodial_factory(crossmint_api)
-crossmint_wallet = crossmint_wallet_factory({
+crossmint_api = CrossmintWalletsAPI(os.getenv("CROSSMINT_API_KEY"), base_url=os.getenv("CROSSMINT_BASE_URL"))
+custodial_factory = custodial_factory(crossmint_api)
+crossmint_wallet = custodial_factory({
     "chain": "solana",
     "connection": client,
     "email": os.getenv("CROSSMINT_USER_EMAIL")
+})
+
+smart_wallet_factory = smart_wallet_factory(crossmint_api)
+crossmint_wallet = smart_wallet_factory({
+    "linkedUser": {
+        "email": os.getenv("CROSSMINT_USER_EMAIL")
+    },
+    "chain": "base",
 })
 
 # Initialize LLM
