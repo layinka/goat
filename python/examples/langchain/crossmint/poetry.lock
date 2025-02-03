@@ -1235,6 +1235,23 @@ type = "directory"
 url = "../../../src/adapters/langchain"
 
 [[package]]
+name = "goat-sdk-plugin-erc20"
+version = "0.1.0"
+description = "Goat plugin for ERC20"
+optional = false
+python-versions = "^3.10"
+files = []
+develop = true
+
+[package.dependencies]
+goat-sdk = "^0.1.0"
+goat-sdk-wallet-evm = "^0.1.0"
+
+[package.source]
+type = "directory"
+url = "../../../src/plugins/erc20"
+
+[[package]]
 name = "goat-sdk-plugin-jupiter"
 version = "0.1.0"
 description = "Goat plugin for jupiter"
@@ -3679,4 +3696,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "209b3bfa21c11ef9f2c6864544f8cff7a035d12d12bfe8d391ab9090573892fa"
+content-hash = "c02f8f77461397d08a8bedbee2894137a8a81bd5b2ced6f117ba8cf5a9adb895"

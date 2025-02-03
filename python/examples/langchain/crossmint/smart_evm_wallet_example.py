@@ -1,20 +1,18 @@
 import os
 import asyncio
 from dotenv import load_dotenv
-from goat_wallets.crossmint.smart_wallet import smart_wallet_factory
 
 # Load environment variables
 load_dotenv()
 
-from goat_wallets.crossmint.custodial_solana_wallet import custodial_factory
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
 
 from goat_adapters.langchain import get_on_chain_tools
-from goat_plugins.jupiter import jupiter, JupiterPluginOptions
-from goat_plugins.spl_token import spl_token, SplTokenPluginOptions
-from goat_plugins.spl_token.tokens import SPL_TOKENS
+from goat_plugins.erc20 import erc20, ERC20PluginOptions
+from goat_plugins.erc20.token import USDC, PEPE
+from goat_wallets.evm.send_eth import send_eth
 from goat_wallets.crossmint import crossmint
 
 crossmint = crossmint(os.getenv("CROSSMINT_API_KEY"))
@@ -46,11 +44,8 @@ async def main():
     tools = get_on_chain_tools(
         wallet=crossmint_wallet,
         plugins=[
-            jupiter(JupiterPluginOptions()),  # No options needed for Jupiter v6
-            spl_token(SplTokenPluginOptions(
-                network="mainnet",  # Using devnet as specified in .env
-                tokens=SPL_TOKENS
-            )),
+            send_eth(),
+            erc20(options=ERC20PluginOptions(tokens=[USDC, PEPE])),
         ],
     )
     
