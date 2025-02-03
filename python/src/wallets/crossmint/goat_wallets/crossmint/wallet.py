@@ -23,7 +23,7 @@ from .parameters import (
     ApproveTransactionParameters,
     CheckTransactionStatusParameters
 )
-from ..api_client import CrossmintWalletsAPI
+from .api_client import CrossmintWalletsAPI
 
 
 class CrossmintWalletService:
@@ -186,11 +186,11 @@ class CrossmintWalletService:
         "description": "Create a wallet for a Twitter user",
         "parameters_schema": CreateWalletForTwitterUserParameters
     })
-    def create_wallet_for_twitter_user(self, wallet_client: EVMWalletClient, parameters: CreateWalletForTwitterUserParameters) -> WalletResponse:
+    def create_wallet_for_twitter_user(self, wallet_client: EVMWalletClient, parameters: dict) -> WalletResponse:
         try:
             response = self.api_client.create_wallet_for_twitter_user(
-                parameters.username,
-                parameters.chain
+                parameters["username"],
+                parameters["chain"]
             )
             return WalletResponse(**response)
         except Exception as error:
@@ -200,11 +200,11 @@ class CrossmintWalletService:
         "description": "Create a wallet for an email user",
         "parameters_schema": CreateWalletForEmailParameters
     })
-    def create_wallet_for_email(self, wallet_client: EVMWalletClient, parameters: CreateWalletForEmailParameters) -> WalletResponse:
+    def create_wallet_for_email(self, wallet_client: EVMWalletClient, parameters: dict) -> WalletResponse:
         try:
             response = self.api_client.create_wallet_for_email(
-                parameters.email,
-                parameters.chain
+                parameters["email"],
+                parameters["chain"]
             )
             return WalletResponse(**response)
         except Exception as error:
@@ -214,11 +214,11 @@ class CrossmintWalletService:
         "description": "Get wallet by Twitter username",
         "parameters_schema": GetWalletByTwitterUsernameParameters
     })
-    def get_wallet_by_twitter_username(self, wallet_client: EVMWalletClient, parameters: GetWalletByTwitterUsernameParameters) -> WalletResponse:
+    def get_wallet_by_twitter_username(self, wallet_client: EVMWalletClient, parameters: dict) -> WalletResponse:
         try:
             response = self.api_client.get_wallet_by_twitter_username(
-                parameters.username,
-                parameters.chain
+                parameters["username"],
+                parameters["chain"]
             )
             return WalletResponse(**response)
         except Exception as error:
@@ -228,11 +228,11 @@ class CrossmintWalletService:
         "description": "Get wallet by email",
         "parameters_schema": GetWalletByEmailParameters
     })
-    def get_wallet_by_email(self, wallet_client: EVMWalletClient, parameters: GetWalletByEmailParameters) -> WalletResponse:
+    def get_wallet_by_email(self, wallet_client: EVMWalletClient, parameters: dict) -> WalletResponse:
         try:
             response = self.api_client.get_wallet_by_email(
-                parameters.email,
-                parameters.chain
+                parameters["email"],
+                parameters["chain"]
             )
             return WalletResponse(**response)
         except Exception as error:

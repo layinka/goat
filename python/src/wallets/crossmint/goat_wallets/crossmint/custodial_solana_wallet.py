@@ -192,7 +192,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
 
 def custodial_factory(api_client: CrossmintWalletsAPI):
     """Factory function to create custodial wallet instances."""
-    def create_custodial(options: Dict) -> CustodialSolanaWalletClient:
+    def create_custodial(options: dict) -> CustodialSolanaWalletClient:
         """Create a new custodial wallet instance."""
         locator = get_locator(options)
         wallet = api_client.get_wallet(locator)

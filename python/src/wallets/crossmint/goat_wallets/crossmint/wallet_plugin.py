@@ -1,4 +1,4 @@
-from goat.classes import Chain
+from goat import Chain
 from .base import PluginBase
 from .wallet import CrossmintWalletService
 from .api_client import CrossmintWalletsAPI

@@ -12,7 +12,7 @@ from goat_wallets.evm import EVMTypedData
 class CrossmintWalletsAPI:
     """Python implementation of CrossmintWalletsAPI."""
     
-    def __init__(self, api_key: str, base_url: str = "https://api.crossmint.com"):
+    def __init__(self, api_key: str, base_url: str = "https://staging.crossmint.com"):
         """Initialize the Crossmint Wallets API client.
         
         Args:
