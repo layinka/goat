@@ -24,7 +24,7 @@ client = SolanaClient(os.getenv("SOLANA_RPC_ENDPOINT"))
 
 crossmint_api = CrossmintWalletsAPI(os.getenv("CROSSMINT_API_KEY"))
 crossmint_wallet_factory = custodial_factory(crossmint_api)
-crossmint_wallet = await crossmint_wallet_factory({
+crossmint_wallet = crossmint_wallet_factory({
     "chain": "solana",
     "connection": client,
     "email": os.getenv("CROSSMINT_USER_EMAIL")
@@ -57,12 +57,6 @@ async def main():
         ],
     )
     
-    # Example of using Crossmint wallet instead:
-    # tools = get_on_chain_tools(
-    #     wallet=crossmint_wallet,
-    #     plugins=[spl_token_plugin]
-    # )
-
     agent = create_tool_calling_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(
         agent=agent, tools=tools, handle_parsing_errors=True, verbose=True
