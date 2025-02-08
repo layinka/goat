@@ -2,6 +2,7 @@ from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
 from typing import Dict
 
+from .parameters import RequestFaucetTokensParameters
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
 
@@ -11,12 +12,9 @@ class CrossmintFaucetService:
 
     @Tool({
         "description": "Request tokens from faucet",
-        "parameters_schema": {"type": "object", "properties": {
-            "wallet_address": {"type": "string"},
-            "chain_id": {"type": "string"}
-        }}
+        "parameters_schema": RequestFaucetTokensParameters
     })
-    def request_faucet_tokens(self, wallet_client: EVMWalletClient, parameters: dict) -> dict:
+    def request_faucet_tokens(self, wallet_client: EVMWalletClient, parameters: RequestFaucetTokensParameters) -> dict:
         try:
             return self.api_client.request_faucet_tokens(
                 parameters["wallet_address"],
