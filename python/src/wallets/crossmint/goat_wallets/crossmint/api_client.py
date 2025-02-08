@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+from goat_plugins.crossmint.parameters import SignTypedDataRequest
 import requests
 from pydantic import BaseModel
 import json
@@ -199,14 +200,14 @@ class CrossmintWalletsAPI:
             Signature response
         """
         endpoint = f"/wallets/{quote(wallet_address)}/signatures"
-        payload = {
-            "type": "evm-typed-data",
-            "params": {
+        payload = SignTypedDataRequest(
+            type="evm-typed-data",
+            params={
                 "typedData": typed_data,
                 "chain": chain,
                 "signer": signer
             }
-        }
+        ).model_dump()
         
         return self._request(endpoint, method="POST", json=payload)
 
@@ -295,7 +296,7 @@ class CrossmintWalletsAPI:
         endpoint = f"/wallets/{quote(wallet_address)}/transactions"
         payload = {
             "params": {
-                "calls": [call.dict() for call in calls],
+                "calls": [call.model_dump() for call in calls],
                 "chain": chain,
                 "signer": f"evm-keypair:{signer}" if signer else None
             }

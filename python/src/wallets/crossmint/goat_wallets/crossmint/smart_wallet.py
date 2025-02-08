@@ -1,13 +1,16 @@
-import asyncio
+import time
 from typing import Dict, List, Optional, TypedDict, Union, cast
-from goat_wallets.evm import EVMWalletClient, EVMTransaction, EVMReadRequest, EVMTypedData
-from web3 import Web3
-from web3.main import AsyncWeb3
-from web3.providers.async_rpc import AsyncHTTPProvider
+from eth_typing import ChecksumAddress
+from goat.classes.wallet_client_base import Balance, Signature
+from goat.types.chain import EvmChain
+from goat_wallets.evm import EVMWalletClient, EVMTransaction, EVMReadRequest, EVMTypedData, EVMReadResult
+from web3 import HTTPProvider, Web3
 from web3._utils.validation import validate_address
 from eth_account.messages import encode_defunct
 from eth_account import Account
+
 from .api_client import CrossmintWalletsAPI, Call
+from ens import ENS
 
 CustodialSigner = str
 KeyPairSigner = TypedDict('KeyPairSigner', {
@@ -59,7 +62,7 @@ def build_transaction_data(
         address=w3_sync.to_checksum_address(recipient_address),
         abi=abi
     )
-    data = contract.encodeFunction(function_name, args or [])
+    data = contract.get_function_by_name(function_name)(*args or []).build_transaction()['data']
     
     return Call(
         to=recipient_address,
@@ -97,8 +100,12 @@ class SmartWalletClient(EVMWalletClient):
         self._signer = signer
         
         # Initialize Web3 providers
-        self._w3 = AsyncWeb3(AsyncHTTPProvider(provider_url))
-        self._ens = AsyncWeb3(AsyncHTTPProvider(ens_provider_url)) if ens_provider_url else None
+        self._w3 = Web3(HTTPProvider(provider_url))
+        if ens_provider_url:
+            ens_w3 = Web3(HTTPProvider(ens_provider_url))
+            self._ens = ENS.from_web3(ens_w3)
+        else:
+            self._ens = None
         
         # Get locator
         self._locator = get_locator(address)
@@ -124,14 +131,14 @@ class SmartWalletClient(EVMWalletClient):
         """Get wallet address."""
         return self._address
     
-    def get_chain(self) -> Dict:
+    def get_chain(self) -> EvmChain:
         """Get chain information."""
-        return {
-            "type": "evm",
-            "id": self._w3.eth.chain_id
-        }
+        return EvmChain(
+            type="evm",
+            id=self._w3.eth.chain_id
+        )
     
-    async def resolve_address(self, address: str) -> str:
+    def resolve_address(self, address: str) -> ChecksumAddress:
         """Resolve ENS name to address."""
         try:
             validate_address(address)
@@ -141,14 +148,14 @@ class SmartWalletClient(EVMWalletClient):
                 raise ValueError("ENS provider is not configured")
             
             try:
-                resolved = await self._ens.ens.resolve_name(address)
+                resolved = self._ens.address(address)
                 if not resolved:
                     raise ValueError("ENS name could not be resolved")
                 return w3_sync.to_checksum_address(resolved)
             except Exception as e:
                 raise ValueError(f"Failed to resolve ENS name: {e}")
     
-    async def sign_message(self, message: str) -> Dict[str, str]:
+    def sign_message(self, message: str) -> Signature:
         """Sign a message with the wallet's private key.
         
         Args:
@@ -168,7 +175,7 @@ class SmartWalletClient(EVMWalletClient):
                 raise ValueError("Signer account is not available")
             signer_address = account.address
             
-        response = await self._client.sign_message_for_smart_wallet(
+        response = self._client.sign_message_for_smart_wallet(
             self._address,
             message,
             self._chain,
@@ -198,7 +205,7 @@ class SmartWalletClient(EVMWalletClient):
             ).signature.hex()
             
             # Submit approval
-            await self._client.approve_signature_for_smart_wallet(
+            self._client.approve_signature_for_smart_wallet(
                 signature_id,
                 self._address,
                 f"evm-keypair:{account.address}",
@@ -207,7 +214,7 @@ class SmartWalletClient(EVMWalletClient):
         
         # Poll for signature status
         while True:
-            status = await self._client.check_signature_status(
+            status = self._client.check_signature_status(
                 signature_id,
                 self._address
             )
@@ -220,14 +227,14 @@ class SmartWalletClient(EVMWalletClient):
             if status["status"] == "failed":
                 raise ValueError("Signature failed")
             
-            await asyncio.sleep(2)  # Wait 2 seconds before checking again
+            time.sleep(2)  # Wait 2 seconds before checking again
     
-    async def sign_typed_data(self, data: EVMTypedData) -> Dict[str, str]:
+    def sign_typed_data(self, data: EVMTypedData) -> Signature:
         """Sign typed data."""
         if not isinstance(self._signer, dict):
             raise ValueError("Keypair signer is required for typed data signing")
         
-        response = await self._client.sign_typed_data_for_smart_wallet(
+        response = self._client.sign_typed_data_for_smart_wallet(
             self._address,
             data,
             self._chain,
@@ -244,7 +251,7 @@ class SmartWalletClient(EVMWalletClient):
                 encode_defunct(hexstr=to_sign)
             ).signature.hex()
             
-            await self._client.approve_signature_for_smart_wallet(
+            self._client.approve_signature_for_smart_wallet(
                 response["id"],
                 self._address,
                 f"evm-keypair:{account.address}",
@@ -252,7 +259,7 @@ class SmartWalletClient(EVMWalletClient):
             )
         
         while True:
-            status = await self._client.check_signature_status(
+            status = self._client.check_signature_status(
                 response["id"],
                 self._address
             )
@@ -265,19 +272,19 @@ class SmartWalletClient(EVMWalletClient):
             if status["status"] == "failed":
                 raise ValueError("Signature failed")
             
-            await asyncio.sleep(2)
+            time.sleep(2)
     
-    async def send_transaction(self, transaction: EVMTransaction) -> Dict[str, str]:
+    def send_transaction(self, transaction: EVMTransaction) -> Dict[str, str]:
         """Send a single transaction."""
-        return await self._send_batch_of_transactions([transaction])
+        return self._send_batch_of_transactions([transaction])
     
-    async def send_batch_of_transactions(
+    def send_batch_of_transactions(
         self, transactions: List[EVMTransaction]
     ) -> Dict[str, str]:
         """Send multiple transactions as a batch."""
-        return await self._send_batch_of_transactions(transactions)
+        return self._send_batch_of_transactions(transactions)
     
-    async def read(self, request: EVMReadRequest) -> Dict:
+    def read(self, request: EVMReadRequest) -> EVMReadResult:
         """Read data from a smart contract.
         
         Args:
@@ -297,31 +304,30 @@ class SmartWalletClient(EVMWalletClient):
         
         if not abi:
             raise ValueError("Read request must include ABI for EVM")
-        
-        # Create contract instance and call function
-        result = await self._w3.eth.read_contract({
-            "address": await self.resolve_address(address),
-            "abi": abi,
-            "functionName": function_name,
-            "args": args
-        })
+
+        contract = self._w3.eth.contract(
+            address=self.resolve_address(address),
+            abi=abi
+        )
+
+        result = contract.get_function_by_name(function_name)(*args).call()
         
         return {"value": result}
     
-    async def balance_of(self, address: str) -> Dict:
+    def balance_of(self, address: str) -> Balance:
         """Get ETH balance of an address."""
-        resolved = await self.resolve_address(address)
-        balance = await self._w3.eth.get_balance(w3_sync.to_checksum_address(resolved))
+        resolved = self.resolve_address(address)
+        balance = self._w3.eth.get_balance(w3_sync.to_checksum_address(resolved))
         
         return {
             "decimals": 18,
             "symbol": "ETH",
             "name": "Ethereum",
             "value": str(w3_sync.from_wei(balance, "ether")),
-            "inBaseUnits": str(balance)
+            "in_base_units": str(balance)
         }
     
-    async def _send_batch_of_transactions(
+    def _send_batch_of_transactions(
         self, transactions: List[EVMTransaction]
     ) -> Dict[str, str]:
         """Internal method to send batch transactions."""
@@ -336,7 +342,7 @@ class SmartWalletClient(EVMWalletClient):
             for tx in transactions
         ]
         
-        response = await self._client.create_transaction_for_smart_wallet(
+        response = self._client.create_transaction_for_smart_wallet(
             self._address,
             transaction_data,
             self._chain,
@@ -356,7 +362,7 @@ class SmartWalletClient(EVMWalletClient):
                 encode_defunct(hexstr=user_op_hash)
             ).signature.hex()
             
-            await self._client.approve_transaction(
+            self._client.approve_transaction(
                 self._locator,
                 response["id"],
                 [{
@@ -366,7 +372,7 @@ class SmartWalletClient(EVMWalletClient):
             )
         
         while True:
-            status = await self._client.check_transaction_status(
+            status = self._client.check_transaction_status(
                 self._locator,
                 response["id"]
             )
@@ -377,7 +383,7 @@ class SmartWalletClient(EVMWalletClient):
                     "status": status["status"]
                 }
             
-            await asyncio.sleep(2)
+            time.sleep(2)
 
 
 def smart_wallet_factory(api_client: CrossmintWalletsAPI):
@@ -385,7 +391,7 @@ def smart_wallet_factory(api_client: CrossmintWalletsAPI):
     async def create_smart_wallet(options: Dict) -> SmartWalletClient:
         """Create a new smart wallet instance."""
         locator = get_locator(options.get("address"), options.get("linkedUser"))
-        wallet = await api_client.get_wallet(locator)
+        wallet = api_client.get_wallet(locator)
         
         return SmartWalletClient(
             wallet["address"],
