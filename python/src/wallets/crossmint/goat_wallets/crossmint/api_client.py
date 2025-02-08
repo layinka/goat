@@ -4,6 +4,7 @@ import requests
 from pydantic import BaseModel
 import json
 from urllib.parse import quote
+import time
 from goat_wallets.evm import EVMTypedData
 
 
@@ -339,3 +340,148 @@ class CrossmintWalletsAPI:
         """
         endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}"
         return self._request(endpoint)
+
+    def create_collection(self, parameters: Dict[str, Any], chain: str) -> Dict[str, Any]:
+        """Create a new NFT collection.
+        
+        Args:
+            parameters: Collection creation parameters
+            chain: Chain identifier
+        
+        Returns:
+            Collection creation response
+        """
+        endpoint = "/2022-06-09/collections/"
+        payload = {**parameters, "chain": chain}
+        return self._request(endpoint, method="POST", json=payload)
+
+    def get_all_collections(self) -> Dict[str, Any]:
+        """Get all collections created by the user.
+        
+        Returns:
+            List of collections
+        """
+        endpoint = "/2022-06-09/collections/"
+        return self._request(endpoint)
+
+    def mint_nft(self, collection_id: str, recipient: str, metadata: Dict[str, Any]) -> Dict[str, Any]:
+        """Mint a new NFT in a collection.
+        
+        Args:
+            collection_id: ID of the collection
+            recipient: Recipient identifier (email:address:chain or chain:address)
+            metadata: NFT metadata
+        
+        Returns:
+            Minted NFT details
+        """
+        endpoint = f"/2022-06-09/collections/{quote(collection_id)}/nfts"
+        payload = {
+            "recipient": recipient,
+            "metadata": metadata
+        }
+        return self._request(endpoint, method="POST", json=payload)
+
+    def create_wallet_for_twitter_user(self, username: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for a Twitter user.
+        
+        Args:
+            username: Twitter username
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        endpoint = "/wallets"
+        payload = {
+            "type": f"{chain}-mpc-wallet",
+            "linkedUser": f"x:{username}"
+        }
+        return self._request(endpoint, method="POST", json=payload)
+
+    def create_wallet_for_email(self, email: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for an email user.
+        
+        Args:
+            email: Email address
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        endpoint = "/wallets"
+        payload = {
+            "type": f"{chain}-mpc-wallet",
+            "linkedUser": f"email:{email}"
+        }
+        return self._request(endpoint, method="POST", json=payload)
+
+    def get_wallet_by_twitter_username(self, username: str, chain: str) -> Dict[str, Any]:
+        """Get wallet details by Twitter username.
+        
+        Args:
+            username: Twitter username
+            chain: Chain identifier
+        
+        Returns:
+            Wallet details
+        """
+        endpoint = f"/wallets/x:{username}:{chain}-mpc-wallet"
+        return self._request(endpoint)
+
+    def get_wallet_by_email(self, email: str, chain: str) -> Dict[str, Any]:
+        """Get wallet details by email.
+        
+        Args:
+            email: Email address
+            chain: Chain identifier
+        
+        Returns:
+            Wallet details
+        """
+        endpoint = f"/wallets/email:{email}:{chain}-mpc-wallet"
+        return self._request(endpoint)
+
+    def request_faucet_tokens(self, wallet_address: str, chain_id: str) -> Dict[str, Any]:
+        """Request tokens from faucet.
+        
+        Args:
+            wallet_address: Wallet address
+            chain_id: Chain identifier
+        
+        Returns:
+            Faucet request response
+        """
+        endpoint = f"/wallets/{quote(wallet_address)}/balances"
+        payload = {
+            "amount": 10,
+            "currency": "usdc",
+            "chain": chain_id
+        }
+        return self._request(endpoint, method="POST", json=payload)
+
+    def wait_for_action(self, action_id: str, max_attempts: int = 60) -> Dict[str, Any]:
+        """Wait for an action to complete.
+        
+        Args:
+            action_id: Action ID to wait for
+            max_attempts: Maximum number of attempts to check status
+        
+        Returns:
+            Action response when completed
+        
+        Raises:
+            Exception: If action times out or fails
+        """
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            endpoint = f"/2022-06-09/actions/{quote(action_id)}"
+            response = self._request(endpoint)
+            
+            if response.get("status") == "succeeded":
+                return response
+                
+            time.sleep(1)
+            
+        raise Exception(f"Timed out waiting for action {action_id} after {attempts} attempts")

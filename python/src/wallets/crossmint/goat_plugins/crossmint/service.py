@@ -1,13 +1,21 @@
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
 from goat_wallets.solana import SolanaWalletClient
+from typing import Any, Dict, List
+
 from .parameters import (
     CreateSmartWalletParameters,
     CreateCustodialWalletParameters,
     WalletResponse,
     SignatureResponse,
     TransactionResponse,
-    Call
+    Call,
+    CollectionParameters,
+    MintNFTParameters,
+    CreateWalletForTwitterUserParameters,
+    CreateWalletForEmailParameters,
+    GetWalletByTwitterUsernameParameters,
+    GetWalletByEmailParameters
 )
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
@@ -277,7 +285,7 @@ class CrossmintService:
             Transaction response
         """
         try:
-            response = await self.api_client.approve_transaction(
+            response = self.api_client.approve_transaction(
                 parameters["locator"],
                 parameters["transaction_id"],
                 parameters["approvals"]
@@ -311,3 +319,205 @@ class CrossmintService:
             return TransactionResponse(**response)
         except Exception as error:
             raise Exception(f"Failed to check transaction status: {error}")
+
+    @Tool({
+        "description": "Create a new NFT collection",
+        "parameters_schema": CollectionParameters
+    })
+    def create_collection(self, wallet_client: EVMWalletClient, parameters: CollectionParameters) -> dict:
+        """Create a new NFT collection.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Collection creation parameters
+        
+        Returns:
+            Created collection details
+        """
+        try:
+            result = self.api_client.create_collection(parameters.model_dump(), "polygon")
+            if result.get("error"):
+                raise Exception(result["message"])
+            
+            action = self.api_client.wait_for_action(result["actionId"])
+            
+            return {
+                "collectionId": result["id"],
+                "chain": "polygon",
+                "contractAddress": action["data"]["collection"]["contractAddress"]
+            }
+        except Exception as error:
+            raise Exception(f"Failed to create collection: {error}")
+
+    @Tool({
+        "description": "Get all collections",
+        "parameters_schema": {}
+    })
+    def get_all_collections(self, wallet_client: EVMWalletClient, parameters: dict) -> Dict[str, Any]:
+        """Get all collections.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Empty parameters
+        
+        Returns:
+            Response containing list of collections
+        """
+        try:
+            return self.api_client.get_all_collections()
+        except Exception as error:
+            raise Exception(f"Failed to get collections: {error}")
+
+    @Tool({
+        "description": "Mint an NFT in a collection",
+        "parameters_schema": MintNFTParameters
+    })
+    def mint_nft(self, wallet_client: EVMWalletClient, parameters: MintNFTParameters) -> dict:
+        """Mint a new NFT.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: NFT minting parameters
+        
+        Returns:
+            Minted NFT details
+        """
+        try:
+            recipient = f"email:{parameters.recipient}:polygon" if parameters.recipient_type == "email" else f"polygon:{parameters.recipient}"
+            
+            result = self.api_client.mint_nft(
+                parameters.collection_id,
+                recipient,
+                parameters.metadata.model_dump()
+            )
+            
+            if result.get("error"):
+                raise Exception(result["message"])
+            
+            action = self.api_client.wait_for_action(result["actionId"])
+            
+            return {
+                "id": result["id"],
+                "collectionId": parameters.collection_id,
+                "contractAddress": result["onChain"]["contractAddress"],
+                "chain": action["data"]["chain"]
+            }
+        except Exception as error:
+            raise Exception(f"Failed to mint NFT: {error}")
+
+    @Tool({
+        "description": "Create a wallet for a Twitter user",
+        "parameters_schema": CreateWalletForTwitterUserParameters
+    })
+    def create_wallet_for_twitter_user(self, wallet_client: EVMWalletClient, parameters: CreateWalletForTwitterUserParameters) -> WalletResponse:
+        """Create a wallet for a Twitter user.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Twitter user wallet creation parameters
+        
+        Returns:
+            Created wallet details
+        """
+        try:
+            response = self.api_client.create_wallet_for_twitter_user(
+                parameters.username,
+                parameters.chain
+            )
+            return WalletResponse(**response)
+        except Exception as error:
+            raise Exception(f"Failed to create wallet for Twitter user: {error}")
+
+    @Tool({
+        "description": "Create a wallet for an email user",
+        "parameters_schema": CreateWalletForEmailParameters
+    })
+    def create_wallet_for_email(self, wallet_client: EVMWalletClient, parameters: CreateWalletForEmailParameters) -> WalletResponse:
+        """Create a wallet for an email user.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Email user wallet creation parameters
+        
+        Returns:
+            Created wallet details
+        """
+        try:
+            response = self.api_client.create_wallet_for_email(
+                parameters.email,
+                parameters.chain
+            )
+            return WalletResponse(**response)
+        except Exception as error:
+            raise Exception(f"Failed to create wallet for email user: {error}")
+
+    @Tool({
+        "description": "Get wallet by Twitter username",
+        "parameters_schema": GetWalletByTwitterUsernameParameters
+    })
+    def get_wallet_by_twitter_username(self, wallet_client: EVMWalletClient, parameters: GetWalletByTwitterUsernameParameters) -> WalletResponse:
+        """Get wallet details by Twitter username.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Parameters containing Twitter username and chain
+        
+        Returns:
+            Wallet details
+        """
+        try:
+            response = self.api_client.get_wallet_by_twitter_username(
+                parameters.username,
+                parameters.chain
+            )
+            return WalletResponse(**response)
+        except Exception as error:
+            raise Exception(f"Failed to get wallet by Twitter username: {error}")
+
+    @Tool({
+        "description": "Get wallet by email",
+        "parameters_schema": GetWalletByEmailParameters
+    })
+    def get_wallet_by_email(self, wallet_client: EVMWalletClient, parameters: GetWalletByEmailParameters) -> WalletResponse:
+        """Get wallet details by email.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Parameters containing email and chain
+        
+        Returns:
+            Wallet details
+        """
+        try:
+            response = self.api_client.get_wallet_by_email(
+                parameters.email,
+                parameters.chain
+            )
+            return WalletResponse(**response)
+        except Exception as error:
+            raise Exception(f"Failed to get wallet by email: {error}")
+
+    @Tool({
+        "description": "Request tokens from faucet",
+        "parameters_schema": {"type": "object", "properties": {
+            "wallet_address": {"type": "string"},
+            "chain_id": {"type": "string"}
+        }}
+    })
+    def request_faucet_tokens(self, wallet_client: EVMWalletClient, parameters: dict) -> dict:
+        """Request tokens from faucet for EVM chains.
+        
+        Args:
+            wallet_client: EVM wallet client
+            parameters: Parameters containing wallet address and chain ID
+        
+        Returns:
+            Faucet request response
+        """
+        try:
+            return self.api_client.request_faucet_tokens(
+                parameters["wallet_address"],
+                parameters["chain_id"]
+            )
+        except Exception as error:
+            raise Exception(f"Failed to request faucet tokens: {error}")
