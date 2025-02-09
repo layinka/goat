@@ -3,7 +3,7 @@ from goat_wallets.evm import EVMWalletClient
 from typing import Dict, Any, List
 
 from .parameters import CollectionParameters, MintNFTParameters, EmptyParameters
-from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
+from .api_client import CrossmintWalletsAPI
 
 
 class CrossmintMintService:

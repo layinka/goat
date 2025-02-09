@@ -1,7 +1,7 @@
 from goat.classes import Chain
 from .base import PluginBase
 from .faucet import CrossmintFaucetService
-from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
+from .api_client import CrossmintWalletsAPI
 
 class FaucetPlugin(PluginBase):
     def __init__(self, client: CrossmintWalletsAPI):

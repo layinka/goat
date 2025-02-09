@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from goat_plugins.crossmint.parameters import (
+from .parameters import (
     SignTypedDataRequest, AdminSigner, Call
 )
 import requests
