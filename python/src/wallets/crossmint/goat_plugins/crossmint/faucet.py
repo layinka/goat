@@ -1,6 +1,5 @@
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
-from typing import Dict
 
 from .parameters import RequestFaucetTokensParameters
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI

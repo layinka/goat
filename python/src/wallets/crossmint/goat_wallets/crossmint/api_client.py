@@ -1,41 +1,12 @@
 from typing import Any, Dict, List, Optional
-from goat_plugins.crossmint.parameters import SignTypedDataRequest
+from goat_plugins.crossmint.parameters import (
+    SignTypedDataRequest, AdminSigner, Call
+)
 import requests
-from pydantic import BaseModel
 import json
 from urllib.parse import quote
 import time
 from goat_wallets.evm import EVMTypedData
-
-
-class AdminSigner(BaseModel):
-    """Configuration for admin signer in wallet creation."""
-    type: str  # evm-keypair, solana-keypair, etc.
-    address: Optional[str] = None
-    locator: Optional[str] = None
-
-
-class TransactionApprovals(BaseModel):
-    """Structure for transaction approvals."""
-    pending: List[Dict[str, Any]]  # Omitting signature, submittedAt, metadata
-    submitted: List[Dict[str, Any]]  # Full approval submissions
-    required: Optional[int] = None  # For multisig scenarios
-
-
-class Call(BaseModel):
-    """Structure for EVM transaction calls."""
-    to: str
-    value: str
-    data: str
-
-
-class TransactionParams(BaseModel):
-    """Parameters for transaction creation."""
-    calls: Optional[List[Call]] = None
-    chain: Optional[str] = None
-    signer: Optional[str] = None
-    transaction: Optional[str] = None
-    signers: Optional[List[str]] = None
 
 
 class CrossmintWalletsAPI:

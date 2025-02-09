@@ -1,8 +1,8 @@
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
-from typing import Dict, Any
+from typing import Dict, Any, List
 
-from .parameters import CollectionParameters, MintNFTParameters
+from .parameters import CollectionParameters, MintNFTParameters, EmptyParameters
 from ...goat_wallets.crossmint.api_client import CrossmintWalletsAPI
 
 
@@ -32,11 +32,12 @@ class CrossmintMintService:
 
     @Tool({
         "description": "Get all collections",
-        "parameters_schema": {}
+        "parameters_schema": EmptyParameters
     })
-    def get_all_collections(self, wallet_client: EVMWalletClient, parameters: dict) -> Dict[str, Any]:
+    def get_all_collections(self, wallet_client: EVMWalletClient, parameters: EmptyParameters) -> List[Dict[str, Any]]:
         try:
-            return self.api_client.get_all_collections()
+            collections = self.api_client.get_all_collections()
+            return list(collections.values()) if isinstance(collections, dict) else collections
         except Exception as error:
             raise Exception(f"Failed to get collections: {error}")
 

@@ -8,7 +8,9 @@ keywords = ["goat", "sdk", "web3", "agents", "ai", "crossmint", "wallet"]
 homepage = "https://ohmygoat.dev/"
 repository = "https://github.com/goat-sdk/goat"
 packages = [
-    { include = "goat_wallets/crossmint" }
+    { include = "goat_wallets/crossmint" },
+    { include = "goat_plugins/crossmint" },
+    { include = "crossmint" }
 ]
 
 [tool.poetry.dependencies]
