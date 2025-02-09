@@ -13,7 +13,7 @@ class CrossmintFaucetService:
         "description": "Request tokens from faucet",
         "parameters_schema": RequestFaucetTokensParameters
     })
-    def request_faucet_tokens(self, wallet_client: EVMWalletClient, parameters: RequestFaucetTokensParameters) -> dict:
+    def request_faucet_tokens(self, wallet_client: EVMWalletClient, parameters: dict) -> dict:
         try:
             return self.api_client.request_faucet_tokens(
                 parameters["wallet_address"],

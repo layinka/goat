@@ -1,11 +1,11 @@
 """CrossMint wallet implementation for GOAT SDK."""
 from typing import Dict, Any
 
-from goat_wallets.crossmint.api_client import CrossmintWalletsAPI
-from goat_plugins.crossmint.faucet_plugin import faucet_plugin
-from goat_plugins.crossmint.mint_plugin import mint_plugin
-from goat_plugins.crossmint.wallet_plugin import wallets_plugin
-from goat_wallets.crossmint import custodial_factory, smart_wallet_factory
+from .goat_wallets.crossmint.api_client import CrossmintWalletsAPI
+from .goat_plugins.crossmint.faucet_plugin import faucet_plugin
+from .goat_plugins.crossmint.mint_plugin import mint_plugin
+from .goat_plugins.crossmint.wallet_plugin import wallets_plugin
+from .goat_wallets.crossmint import custodial_factory, smart_wallet_factory
 
 def crossmint(api_key: str) -> Dict[str, Any]:
     """Initialize CrossMint SDK with API key.
