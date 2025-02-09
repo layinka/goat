@@ -14,9 +14,9 @@ class CrossmintMintService:
         "description": "Create a new NFT collection",
         "parameters_schema": CollectionParameters
     })
-    def create_collection(self, wallet_client: EVMWalletClient, parameters: CollectionParameters) -> dict:
+    def create_collection(self, wallet_client: EVMWalletClient, parameters: dict) -> dict:
         try:
-            result = self.api_client.create_collection(parameters.model_dump(), "polygon")
+            result = self.api_client.create_collection(parameters, "polygon")
             if result.get("error"):
                 raise Exception(result["message"])
             
@@ -34,7 +34,7 @@ class CrossmintMintService:
         "description": "Get all collections",
         "parameters_schema": EmptyParameters
     })
-    def get_all_collections(self, wallet_client: EVMWalletClient, parameters: EmptyParameters) -> List[Dict[str, Any]]:
+    def get_all_collections(self, wallet_client: EVMWalletClient, parameters: dict) -> List[Dict[str, Any]]:
         try:
             collections = self.api_client.get_all_collections()
             return list(collections.values()) if isinstance(collections, dict) else collections
@@ -45,14 +45,14 @@ class CrossmintMintService:
         "description": "Mint an NFT in a collection",
         "parameters_schema": MintNFTParameters
     })
-    def mint_nft(self, wallet_client: EVMWalletClient, parameters: MintNFTParameters) -> dict:
+    def mint_nft(self, wallet_client: EVMWalletClient, parameters: dict) -> dict:
         try:
-            recipient = f"email:{parameters.recipient}:polygon" if parameters.recipient_type == "email" else f"polygon:{parameters.recipient}"
+            recipient = f"email:{parameters["recipient"]}:polygon" if parameters["recipient_type"] == "email" else f"polygon:{parameters["recipient"]}"
             
             result = self.api_client.mint_nft(
-                parameters.collection_id,
+                parameters["collection_id"],
                 recipient,
-                parameters.metadata.model_dump()
+                parameters["metadata"]
             )
             
             if result.get("error"):
@@ -62,7 +62,7 @@ class CrossmintMintService:
             
             return {
                 "id": result["id"],
-                "collectionId": parameters.collection_id,
+                "collectionId": parameters["collection_id"],
                 "contractAddress": result["onChain"]["contractAddress"],
                 "chain": action["data"]["chain"]
             }

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
-from goat.classes import Chain
+from goat import Chain
 
 class PluginBase(ABC):
     def __init__(self, name: str, services: List[Any]):

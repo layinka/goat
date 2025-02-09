@@ -28,7 +28,7 @@ from .parameters import (
     CheckTransactionStatusParameters,
     EmptyParameters
 )
-from ..api_client import CrossmintWalletsAPI
+from .api_client import CrossmintWalletsAPI
 
 
 class CrossmintService:

@@ -1,4 +1,4 @@
-from goat.classes import Chain
+from goat import Chain
 from .base import PluginBase
 from .mint import CrossmintMintService
 from .api_client import CrossmintWalletsAPI
@@ -8,9 +8,9 @@ class MintPlugin(PluginBase):
         super().__init__("mint", [CrossmintMintService(client)])
 
     def supports_chain(self, chain: Chain) -> bool:
-        if chain.type == "evm":
-            return self._is_chain_supported_by_minting(chain.id or 0)
-        return chain.type in ["aptos", "solana"]
+        if chain["type"] == "evm":
+            return self._is_chain_supported_by_minting(chain["id"] or 0)
+        return chain["type"] in ["aptos", "solana"]
 
     @staticmethod
     def _is_chain_supported_by_minting(chain_id: int) -> bool:

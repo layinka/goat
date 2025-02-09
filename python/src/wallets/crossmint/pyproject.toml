@@ -19,6 +19,7 @@ goat-sdk-wallet-evm = "^0.1.0"
 goat-sdk-wallet-solana = "^0.1.0"
 eth-account = "^0.8"
 base58 = "^2.1"
+setuptools = "^70"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3"
