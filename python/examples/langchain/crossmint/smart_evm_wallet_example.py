@@ -10,30 +10,20 @@ from goat_wallets.crossmint.custodial_solana_wallet import custodial_factory
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
-from solana.rpc.api import Client as SolanaClient
 
 from goat_adapters.langchain import get_on_chain_tools
 from goat_plugins.jupiter import jupiter, JupiterPluginOptions
 from goat_plugins.spl_token import spl_token, SplTokenPluginOptions
 from goat_plugins.spl_token.tokens import SPL_TOKENS
-from goat_wallets.crossmint.api_client import CrossmintWalletsAPI
+from goat_wallets.crossmint import crossmint
 
-# Initialize Solana client
-client = SolanaClient(os.getenv("SOLANA_RPC_ENDPOINT"))
+crossmint = crossmint(os.getenv("CROSSMINT_API_KEY"))
 
-crossmint_api = CrossmintWalletsAPI(os.getenv("CROSSMINT_API_KEY"), base_url=os.getenv("CROSSMINT_BASE_URL"))
-custodial_factory = custodial_factory(crossmint_api)
-crossmint_wallet = custodial_factory({
-    "chain": "solana",
-    "connection": client,
-    "email": os.getenv("CROSSMINT_USER_EMAIL")
-})
-
-smart_wallet_factory = smart_wallet_factory(crossmint_api)
-crossmint_wallet = smart_wallet_factory({
-    "linkedUser": {
-        "email": os.getenv("CROSSMINT_USER_EMAIL")
-    },
+crossmint_wallet = crossmint["smartwallet"]({
+    "address": "0x60096F6E9143DbfdeB12aB81C81eD560584B2954",
+    "signer": "0x0b76745250FEF8fBa8e597b84CdaE46B5aC03573",
+    "provider": "https://base-mainnet.g.alchemy.com/v2/demo",
+    "ensProvider": "https://base-mainnet.g.alchemy.com/v2/demo",
     "chain": "base",
 })
 

@@ -17,5 +17,9 @@ poetry install --no-root
 ## Usage
 
 ```
-poetry run example.py
+poetry run smart_evm_wallet_example.py
+```
+
+```
+poetry run custodial_solana_wallet_example.py
 ```
