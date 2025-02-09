@@ -9,3 +9,6 @@ class WalletPlugin(PluginBase):
 
     def supports_chain(self, chain: Chain) -> bool:
         return True
+
+def wallets_plugin(client: CrossmintWalletsAPI) -> WalletPlugin:
+    return WalletPlugin(client)
