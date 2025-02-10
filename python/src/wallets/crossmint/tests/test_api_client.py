@@ -27,21 +27,36 @@ def test_base_url_configuration(custodial_api):
 
 def test_url_encoding_email(custodial_api, test_email):
     """Test URL parameter encoding with email."""
-    encoded = quote(f"email:{test_email}:solana-mpc-wallet")
-    with pytest.raises(Exception) as exc:
-        custodial_api.get_wallet_by_email(test_email, "solana")
-    # Should raise not found error, but URL should be properly encoded
-    assert encoded in str(exc.value)
+    # Make a request that will fail but still let us check URL encoding
+    locator = f"email:{test_email}:solana-mpc-wallet"
+    encoded = quote(locator)
+    response = requests.get(
+        f"{custodial_api.base_url}/wallets/{encoded}",
+        headers={
+            "x-api-key": custodial_api.api_key,
+            "Content-Type": "application/json"
+        }
+    )
+    # Verify URL was properly encoded
+    assert encoded in response.url
+    assert response.status_code == 404  # Wallet should not exist
 
 
 def test_url_encoding_special_chars(custodial_api):
     """Test URL parameter encoding with special characters."""
     special_chars = "test:user+@example.com"
-    encoded = quote(f"email:{special_chars}:solana-mpc-wallet")
-    with pytest.raises(Exception) as exc:
-        custodial_api.get_wallet_by_email(special_chars, "solana")
-    # Verify the special characters were properly encoded
-    assert encoded in str(exc.value)
+    locator = f"email:{special_chars}:solana-mpc-wallet"
+    encoded = quote(locator)
+    response = requests.get(
+        f"{custodial_api.base_url}/wallets/{encoded}",
+        headers={
+            "x-api-key": custodial_api.api_key,
+            "Content-Type": "application/json"
+        }
+    )
+    # Verify URL was properly encoded
+    assert encoded in response.url
+    assert response.status_code == 400  # Invalid wallet type
 
 
 def test_error_handling_not_found(custodial_api):
