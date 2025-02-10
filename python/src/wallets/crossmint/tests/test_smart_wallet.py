@@ -18,7 +18,7 @@ from .utils.helpers import (
 def test_wallet_options():
     """Fixture providing test wallet options."""
     return {
-        "chain": "sepolia",
+        "chain": "base-sepolia",
         "provider": "https://rpc.sepolia.org",
         "options": {
             "ensProvider": "https://rpc.sepolia.org"
@@ -43,7 +43,7 @@ def test_smart_wallet_creation(smart_api, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
     
@@ -58,7 +58,7 @@ def test_smart_wallet_with_admin_signer(smart_api, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
 
@@ -69,7 +69,7 @@ def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options, tes
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -91,7 +91,7 @@ def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_messa
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -119,7 +119,7 @@ def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_trans
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -146,7 +146,7 @@ def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_ke
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -185,7 +185,7 @@ def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -228,7 +228,7 @@ def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -260,7 +260,7 @@ def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypai
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -299,7 +299,7 @@ def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_op
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com", chain="base-sepolia")
     options = {**test_wallet_options, **invalid_options}
     
     with pytest.raises((Exception, ValueError)) as exc:

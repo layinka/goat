@@ -61,7 +61,8 @@ class CrossmintWalletsAPI:
         self,
         admin_signer: Optional[AdminSigner] = None,
         email: Optional[str] = None,
-        user_id: Optional[str] = None
+        user_id: Optional[str] = None,
+        chain: str = "base-sepolia"
     ) -> Dict[str, Any]:
         """Create a new EVM smart wallet.
         
@@ -69,6 +70,7 @@ class CrossmintWalletsAPI:
             admin_signer: Optional admin signer configuration
             email: Optional email to link the wallet to
             user_id: Optional user ID to link the wallet to
+            chain: Chain identifier (default: ethereum)
         
         Returns:
             Wallet creation response
@@ -82,7 +84,8 @@ class CrossmintWalletsAPI:
         payload = {
             "type": "evm-smart-wallet",
             "config": {
-                "adminSigner": admin_signer.model_dump() if admin_signer else None
+                "adminSigner": admin_signer.model_dump() if admin_signer else None,
+                "chain": chain
             },
             "linkedUser": {
                 "email": email,
