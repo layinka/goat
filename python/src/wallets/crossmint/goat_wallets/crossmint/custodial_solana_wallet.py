@@ -109,18 +109,15 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         # Create message with dummy payer key (will be replaced by API)
         dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
         
-        # Create message and compile to V0 like TypeScript implementation
-        message = Message(
+        # Create message with blockhash like TypeScript implementation
+        message = Message.new_with_blockhash(
             instructions=instructions,
-            payer=dummy_payer  # Use dummy payer key
+            payer=dummy_payer,  # Use dummy payer key
+            blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
         )
         
-        # Compile to V0 message
-        message_v0 = message.compile_to_legacy_message()
-        message_v0.recent_blockhash = Hash.from_string("11111111111111111111111111111111")
-        
-        # Create versioned transaction
-        versioned_transaction = VersionedTransaction(message_v0)
+        # Create versioned transaction with empty signatures
+        versioned_transaction = VersionedTransaction(message)
         
         # Serialize and encode transaction
         serialized = base58.b58encode(bytes(versioned_transaction)).decode()
