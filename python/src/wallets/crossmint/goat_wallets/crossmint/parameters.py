@@ -18,6 +18,8 @@ class AdminSigner(BaseModel):
     type: CoreSignerType
     address: Optional[str] = None
     locator: Optional[str] = None
+    signature: Optional[str] = None
+    chain: Optional[str] = None
 
 
 class CreateSmartWalletParameters(BaseModel):
