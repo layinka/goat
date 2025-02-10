@@ -20,7 +20,7 @@ class CrossmintWalletsAPI:
             base_url: Base URL for the Crossmint API
         """
         self.api_key = api_key
-        self.base_url = base_url
+        self.base_url = f"{base_url}/api/v1-alpha1"
     
     def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
         """Make an HTTP request to the Crossmint API.
@@ -57,19 +57,36 @@ class CrossmintWalletsAPI:
         except Exception as e:
             raise Exception(f"Failed to {method.lower()} {endpoint}: {e}")
     
-    def create_smart_wallet(self, admin_signer: Optional[AdminSigner] = None) -> Dict[str, Any]:
+    def create_smart_wallet(
+        self,
+        admin_signer: Optional[AdminSigner] = None,
+        email: Optional[str] = None,
+        user_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Create a new EVM smart wallet.
         
         Args:
             admin_signer: Optional admin signer configuration
+            email: Optional email to link the wallet to
+            user_id: Optional user ID to link the wallet to
         
         Returns:
             Wallet creation response
+        
+        Raises:
+            ValueError: If neither email nor user_id is provided
         """
+        if not email and not user_id:
+            raise ValueError("Either email or user_id must be provided")
+            
         payload = {
             "type": "evm-smart-wallet",
             "config": {
                 "adminSigner": admin_signer.model_dump() if admin_signer else None
+            },
+            "linkedUser": {
+                "email": email,
+                "userId": user_id
             }
         }
         
