@@ -108,15 +108,22 @@ def test_custodial_wallet_transaction(custodial_api, test_email, solana_connecti
         {"email": test_email}
     )
     
-    # Create a simple transfer instruction
+    # Create a transfer instruction
     instruction = Instruction(
         program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
-        accounts=[AccountMeta(
-            pubkey=Pubkey.from_string(wallet["address"]),
-            is_signer=True,
-            is_writable=True
-        )],
-        data=bytes()  # Empty for test
+        accounts=[
+            AccountMeta(
+                pubkey=Pubkey.from_string(wallet["address"]),  # From
+                is_signer=True,
+                is_writable=True
+            ),
+            AccountMeta(
+                pubkey=Pubkey.from_string(wallet["address"]),  # To (same address for test)
+                is_signer=False,
+                is_writable=True
+            )
+        ],
+        data=bytes([2, 0, 0, 0]) + (1000000).to_bytes(8, 'little')  # Transfer 0.001 SOL
     )
     
     # Send transaction
@@ -139,15 +146,22 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
         {"email": test_email}
     )
     
-    # Create a simple message
+    # Create a transfer instruction
     instruction = Instruction(
         program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
-        accounts=[AccountMeta(
-            pubkey=Pubkey.from_string(wallet["address"]),
-            is_signer=True,
-            is_writable=True
-        )],
-        data=bytes()  # Empty for test
+        accounts=[
+            AccountMeta(
+                pubkey=Pubkey.from_string(wallet["address"]),  # From
+                is_signer=True,
+                is_writable=True
+            ),
+            AccountMeta(
+                pubkey=Pubkey.from_string(wallet["address"]),  # To (same address for test)
+                is_signer=False,
+                is_writable=True
+            )
+        ],
+        data=bytes([2, 0, 0, 0]) + (1000000).to_bytes(8, 'little')  # Transfer 0.001 SOL
     )
     # Create message with dummy payer key (will be replaced by API)
     dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
