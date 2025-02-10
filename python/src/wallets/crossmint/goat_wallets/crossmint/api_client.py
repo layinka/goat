@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from .parameters import (
     SignTypedDataRequest, AdminSigner, Call
 )
@@ -20,14 +20,21 @@ class CrossmintWalletsAPI:
             base_url: Base URL for the Crossmint API
         """
         self.api_key = api_key
-        self.base_url = f"{base_url}/api/v1-alpha1"
+        self.base_url = f"{base_url}/api/v1-alpha2"
     
-    def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
+    def _request(
+        self,
+        endpoint: str,
+        method: str = "GET",
+        timeout: Optional[float] = None,
+        **kwargs
+    ) -> Dict[str, Any]:
         """Make an HTTP request to the Crossmint API.
         
         Args:
             endpoint: API endpoint (relative to base_url)
             method: HTTP method to use
+            timeout: Optional request timeout in seconds
             **kwargs: Additional arguments to pass to requests
         
         Returns:
@@ -44,6 +51,7 @@ class CrossmintWalletsAPI:
         }
         
         try:
+            kwargs["timeout"] = timeout if timeout is not None else 30
             response = requests.request(method, url, headers=headers, **kwargs)
             response_body = response.json()
             
@@ -420,18 +428,19 @@ class CrossmintWalletsAPI:
         endpoint = f"/wallets/x:{username}:{chain}-mpc-wallet"
         return self._request(endpoint)
 
-    def get_wallet_by_email(self, email: str, chain: str) -> Dict[str, Any]:
+    def get_wallet_by_email(self, email: str, chain: str, timeout: Optional[float] = None) -> Dict[str, Any]:
         """Get wallet details by email.
         
         Args:
             email: Email address
             chain: Chain identifier
+            timeout: Optional request timeout in seconds
         
         Returns:
             Wallet details
         """
         endpoint = f"/wallets/email:{email}:{chain}-mpc-wallet"
-        return self._request(endpoint)
+        return self._request(endpoint, timeout=timeout)
 
     def request_faucet_tokens(self, wallet_address: str, chain_id: str) -> Dict[str, Any]:
         """Request tokens from faucet.
