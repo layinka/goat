@@ -3,6 +3,7 @@ import os
 from web3 import Web3
 from eth_account import Account
 from goat_wallets.crossmint import SmartWalletClient
+from goat_wallets.crossmint.parameters import AdminSigner, CoreSignerType
 from .utils.helpers import (
     compare_wallet_responses,
     compare_transaction_responses,
@@ -36,10 +37,10 @@ def test_keypair():
 def test_smart_wallet_creation(smart_api, test_keypair):
     """Test smart wallet creation and retrieval."""
     # Create wallet
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
@@ -51,10 +52,10 @@ def test_smart_wallet_creation(smart_api, test_keypair):
 
 def test_smart_wallet_with_admin_signer(smart_api, test_keypair):
     """Test smart wallet creation with admin signer."""
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
@@ -62,10 +63,10 @@ def test_smart_wallet_with_admin_signer(smart_api, test_keypair):
 
 def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options, test_keypair):
     """Test smart wallet creation with email."""
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -84,10 +85,10 @@ def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options, tes
 def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_message, test_keypair):
     """Test message signing with smart wallet."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -112,10 +113,10 @@ def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_messa
 def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_transaction, test_keypair):
     """Test transaction sending with smart wallet."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -139,10 +140,10 @@ def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_trans
 def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_keypair):
     """Test sending batch transactions."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -178,10 +179,10 @@ def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_ke
 def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair):
     """Test reading from a smart contract."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -221,10 +222,10 @@ def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair
 def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
     """Test getting wallet balance."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -253,10 +254,10 @@ def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
 def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypair):
     """Test ENS name resolution."""
     # Create wallet and client
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
@@ -287,10 +288,10 @@ def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypai
 ])
 def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_options, test_keypair):
     """Test error handling with invalid options."""
-    admin_signer = {
-        "type": "evm-keypair",
-        "address": test_keypair["address"]
-    }
+    admin_signer = AdminSigner(
+        type=CoreSignerType.EVM_KEYPAIR,
+        address=test_keypair["address"]
+    )
     wallet = smart_api.create_smart_wallet(admin_signer)
     options = {**test_wallet_options, **invalid_options}
     
