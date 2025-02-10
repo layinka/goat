@@ -89,16 +89,13 @@ class CrossmintWalletsAPI:
         if not email and not user_id:
             raise ValueError("Either email or user_id must be provided")
             
+        linked_user = f"email:{email}" if email else f"userId:{user_id}"
         payload = {
             "type": "evm-smart-wallet",
             "config": {
-                "adminSigner": admin_signer.model_dump() if admin_signer else None,
-                "chain": chain
+                "adminSigner": admin_signer.model_dump() if admin_signer else None
             },
-            "linkedUser": {
-                "email": email,
-                "userId": user_id
-            }
+            "linkedUser": linked_user
         }
         
         return self._request("/wallets", method="POST", json=payload)
@@ -107,11 +104,19 @@ class CrossmintWalletsAPI:
         """Create a new Solana custodial wallet.
         
         Args:
-            linked_user: User identifier to link the wallet to
+            linked_user: User identifier (email, phone, or userId)
         
         Returns:
             Wallet creation response
         """
+        # Format linkedUser based on type
+        if "@" in linked_user:
+            linked_user = f"email:{linked_user}"
+        elif linked_user.startswith("+"):
+            linked_user = f"phoneNumber:{linked_user}"
+        else:
+            linked_user = f"userId:{linked_user}"
+            
         payload = {
             "type": "solana-mpc-wallet",
             "linkedUser": linked_user
@@ -439,7 +444,8 @@ class CrossmintWalletsAPI:
         Returns:
             Wallet details
         """
-        endpoint = f"/wallets/email:{email}:{chain}-mpc-wallet"
+        encoded_email = quote(email)
+        endpoint = f"/wallets/email:{encoded_email}:{chain}-mpc-wallet"
         return self._request(endpoint, timeout=timeout)
 
     def request_faucet_tokens(self, wallet_address: str, chain_id: str) -> Dict[str, Any]:
