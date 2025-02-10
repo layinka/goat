@@ -2,7 +2,7 @@ import pytest
 import base58
 from solders.instruction import Instruction, AccountMeta
 from solders.pubkey import Pubkey
-from solders.message import Message
+from solders.message import Message, MessageV0
 from solders.transaction import Transaction, VersionedTransaction
 from solders.hash import Hash
 from solders.signature import Signature
