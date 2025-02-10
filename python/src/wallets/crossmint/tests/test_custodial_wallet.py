@@ -36,10 +36,10 @@ def test_custodial_wallet_creation_with_phone(custodial_api, test_phone, solana_
     """Test custodial wallet creation with phone number."""
     # Create wallet
     wallet = custodial_api.create_custodial_wallet(test_phone)
-    assert wallet["type"] == "solana-custodial-wallet"
+    assert wallet["type"] == "solana-mpc-wallet"
     
     # Verify retrieval
-    retrieved = custodial_api.get_wallet(f"phone:{test_phone}:solana-custodial-wallet")
+    retrieved = custodial_api.get_wallet(f"phone:{test_phone}:solana-mpc-wallet")
     compare_wallet_responses(wallet, retrieved)
     
     # Test client creation
@@ -56,10 +56,10 @@ def test_custodial_wallet_creation_with_user_id(custodial_api, test_user_id, sol
     """Test custodial wallet creation with user ID."""
     # Create wallet
     wallet = custodial_api.create_custodial_wallet(str(test_user_id))
-    assert wallet["type"] == "solana-custodial-wallet"
+    assert wallet["type"] == "solana-mpc-wallet"
     
     # Verify retrieval
-    retrieved = custodial_api.get_wallet(f"userId:{test_user_id}:solana-custodial-wallet")
+    retrieved = custodial_api.get_wallet(f"userId:{test_user_id}:solana-mpc-wallet")
     compare_wallet_responses(wallet, retrieved)
     
     # Test client creation
@@ -103,7 +103,11 @@ def test_custodial_wallet_transaction(custodial_api, test_email, solana_connecti
     # Create a simple transfer instruction
     instruction = Instruction(
         program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
-        accounts=[],  # Empty for test
+        accounts=[{
+            "pubkey": Pubkey.from_string(wallet["address"]),
+            "is_signer": True,
+            "is_writable": True
+        }],
         data=bytes()  # Empty for test
     )
     
@@ -128,8 +132,17 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     )
     
     # Create a simple message
+    instruction = Instruction(
+        program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
+        accounts=[{
+            "pubkey": Pubkey.from_string(wallet["address"]),
+            "is_signer": True,
+            "is_writable": True
+        }],
+        data=bytes()  # Empty for test
+    )
     message = Message(
-        instructions=[],  # Empty for test
+        instructions=[instruction],
         payer=Pubkey.from_string(wallet["address"])
     )
     

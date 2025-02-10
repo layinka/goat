@@ -444,8 +444,8 @@ class CrossmintWalletsAPI:
         Returns:
             Wallet details
         """
-        encoded_email = quote(email)
-        endpoint = f"/wallets/email:{encoded_email}:{chain}-mpc-wallet"
+        locator = f"email:{email}:{chain}-mpc-wallet"
+        endpoint = f"/wallets/{quote(locator)}"
         return self._request(endpoint, timeout=timeout)
 
     def request_faucet_tokens(self, wallet_address: str, chain_id: str) -> Dict[str, Any]:

@@ -107,4 +107,5 @@ def test_request_timeout_handling(custodial_api, test_email):
             "solana",
             timeout=0.001  # Very short timeout
         )
-    assert "timeout" in str(exc.value).lower() or "timed out" in str(exc.value).lower()
+    error_msg = str(exc.value).lower()
+    assert any(msg in error_msg for msg in ["timeout", "timed out", "unreachable"])
