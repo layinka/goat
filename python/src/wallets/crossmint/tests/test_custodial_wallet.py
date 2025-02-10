@@ -156,10 +156,9 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     )
     
     # Create versioned transaction with empty signature
-    empty_sig = Signature(bytes([0] * Signature.LENGTH))  # Create empty signature using LENGTH constant
     transaction = VersionedTransaction.populate(
         message=message,
-        signatures=[empty_sig]  # Empty signature placeholder
+        signatures=[Signature.new_unique()]  # Empty signature placeholder
     )
     
     # Serialize and encode
