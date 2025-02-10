@@ -4,6 +4,8 @@ import base58
 from solders.instruction import Instruction
 from solders.pubkey import Pubkey
 from solders.message import Message
+from solders.transaction import VersionedTransaction
+from solders.hash import Hash
 from solana.rpc.api import Client as SolanaClient
 from goat.classes.wallet_client_base import Balance, Signature
 from goat_wallets.solana import SolanaWalletClient, SolanaTransaction
@@ -103,14 +105,21 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             )
             instructions.append(instruction)
         
-        # Create message using solders Message
-        message = Message(
+        # Create legacy message
+        message = Message.new_with_blockhash(
             instructions=instructions,
             payer=Pubkey.from_string(self._address),
+            blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
+        )
+        
+        # Create versioned transaction with empty signature
+        transaction = VersionedTransaction(
+            message=message,
+            signatures=[bytes(64)]  # Empty signature placeholder
         )
         
         # Serialize and encode transaction
-        serialized = base58.b58encode(bytes(message)).decode()
+        serialized = base58.b58encode(bytes(transaction)).decode()
         
         # Create and submit transaction
         response = self._client.create_transaction_for_custodial_wallet(

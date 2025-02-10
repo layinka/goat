@@ -1,8 +1,10 @@
 import pytest
-from base58 import b58encode
+import base58
 from solders.instruction import Instruction, AccountMeta
 from solders.pubkey import Pubkey
 from solders.message import Message
+from solders.transaction import VersionedTransaction
+from solders.hash import Hash
 from goat_wallets.crossmint import CustodialSolanaWalletClient
 from .utils.helpers import (
     compare_wallet_responses,
@@ -146,13 +148,20 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
         )],
         data=bytes()  # Empty for test
     )
-    message = Message(
+    message = Message.new_with_blockhash(
         instructions=[instruction],
-        payer=Pubkey.from_string(wallet["address"])
+        payer=Pubkey.from_string(wallet["address"]),
+        blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
+    )
+    
+    # Create versioned transaction with empty signature
+    transaction = VersionedTransaction(
+        message=message,
+        signatures=[bytes(64)]  # Empty signature placeholder
     )
     
     # Serialize and encode
-    serialized = b58encode(bytes(message)).decode()
+    serialized = base58.b58encode(bytes(transaction)).decode()
     
     # Send raw transaction
     tx = client.send_raw_transaction(serialized)
