@@ -5,6 +5,7 @@ from solders.pubkey import Pubkey
 from solders.message import Message
 from solders.transaction import VersionedTransaction
 from solders.hash import Hash
+from solders.signature import Signature
 from goat_wallets.crossmint import CustodialSolanaWalletClient
 from .utils.helpers import (
     compare_wallet_responses,
@@ -155,9 +156,9 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     )
     
     # Create versioned transaction with empty signature
-    transaction = VersionedTransaction(
+    transaction = VersionedTransaction.populate(
         message=message,
-        signatures=[bytes(64)]  # Empty signature placeholder
+        signatures=[Signature.default()]  # Empty signature placeholder
     )
     
     # Serialize and encode

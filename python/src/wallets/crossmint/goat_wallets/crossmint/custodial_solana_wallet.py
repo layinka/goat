@@ -6,6 +6,7 @@ from solders.pubkey import Pubkey
 from solders.message import Message
 from solders.transaction import VersionedTransaction
 from solders.hash import Hash
+from solders.signature import Signature
 from solana.rpc.api import Client as SolanaClient
 from goat.classes.wallet_client_base import Balance, Signature
 from goat_wallets.solana import SolanaWalletClient, SolanaTransaction
@@ -113,9 +114,9 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         )
         
         # Create versioned transaction with empty signature
-        transaction = VersionedTransaction(
+        transaction = VersionedTransaction.populate(
             message=message,
-            signatures=[bytes(64)]  # Empty signature placeholder
+            signatures=[Signature.default()]  # Empty signature placeholder
         )
         
         # Serialize and encode transaction
