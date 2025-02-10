@@ -113,10 +113,10 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
         )
         
-        # Create versioned transaction with empty signature
-        transaction = VersionedTransaction.populate(
+        # Create transaction without signatures
+        transaction = VersionedTransaction(
             message=message,
-            signatures=[Signature.new_unique()]  # Empty signature placeholder
+            keypairs=[]  # No signatures, let the API handle signing
         )
         
         # Serialize and encode transaction
