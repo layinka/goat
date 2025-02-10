@@ -186,8 +186,13 @@ def test_custodial_wallet_balance(custodial_api, test_email, solana_connection):
 ])
 def test_custodial_wallet_invalid_options(custodial_api, invalid_options, solana_connection):
     """Test error handling with invalid options."""
+    # Format the invalid value based on type
+    value = list(invalid_options.values())[0]
+    if "phone" in invalid_options:
+        value = f"+{value}"  # Add + prefix for phone numbers
+    
     with pytest.raises(Exception) as exc:
-        custodial_api.create_custodial_wallet(list(invalid_options.values())[0])
+        custodial_api.create_custodial_wallet(value)
     assert "error" in str(exc.value).lower() or "invalid" in str(exc.value).lower()
 
 
