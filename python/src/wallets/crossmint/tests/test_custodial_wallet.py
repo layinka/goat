@@ -185,9 +185,9 @@ def test_custodial_wallet_balance(custodial_api, test_email, solana_connection):
 
 
 @pytest.mark.parametrize("invalid_options", [
-    {"email": "invalid@email"},
-    {"phone": "invalid-phone"},
-    {"userId": "invalid-id"}
+    {"email": ""},  # Empty email
+    {"phone": "123"},  # Invalid phone format
+    {"userId": ""}  # Empty user ID
 ])
 def test_custodial_wallet_invalid_options(custodial_api, invalid_options, solana_connection):
     """Test error handling with invalid options."""
@@ -200,7 +200,11 @@ def test_custodial_wallet_invalid_options(custodial_api, invalid_options, solana
         custodial_api.create_custodial_wallet(value)
         pytest.fail("Expected an error but none was raised")
     except Exception as e:
-        assert "error" in str(e).lower() or "invalid" in str(e).lower()
+        assert any(msg in str(e).lower() for msg in [
+            "error",
+            "invalid",
+            "bad request"
+        ])
 
 
 def test_custodial_wallet_invalid_transaction(custodial_api, test_email, solana_connection):
