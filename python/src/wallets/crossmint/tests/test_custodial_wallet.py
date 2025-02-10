@@ -151,10 +151,11 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     )
     # Create message with dummy payer key (will be replaced by API)
     dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
+    latest_blockhash = solana_connection.get_latest_blockhash()
     message = Message.new_with_blockhash(
         instructions=[instruction],
         payer=dummy_payer,  # Use dummy payer key
-        blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
+        blockhash=Hash.from_string(latest_blockhash.value.blockhash)  # Use latest blockhash
     )
     
     # Create transaction without signatures
