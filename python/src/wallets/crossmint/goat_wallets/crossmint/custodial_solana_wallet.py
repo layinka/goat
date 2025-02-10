@@ -142,6 +142,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             
             if status["status"] == "success":
                 return {
+                    "status": "success",
                     "hash": status.get("onChain", {}).get("txId", "")
                 }
             
@@ -194,6 +195,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             
             if status["status"] == "success":
                 return {
+                    "status": "success",
                     "hash": status.get("onChain", {}).get("txId", "")
                 }
             
