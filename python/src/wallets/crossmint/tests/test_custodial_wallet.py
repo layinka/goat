@@ -155,7 +155,7 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     message = Message.new_with_blockhash(
         instructions=[instruction],
         payer=dummy_payer,  # Use dummy payer key
-        blockhash=Hash.from_string(latest_blockhash.value.blockhash)  # Use latest blockhash
+        blockhash=Hash.from_string(str(latest_blockhash.value.blockhash))  # Use latest blockhash
     )
     
     # Create transaction without signatures
