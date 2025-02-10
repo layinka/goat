@@ -38,7 +38,12 @@ def test_url_encoding_email(custodial_api, test_email):
         }
     )
     # Verify URL was properly encoded
-    assert encoded in response.url
+    url_parts = response.url.split("/wallets/")
+    encoded_part = url_parts[1] if len(url_parts) > 1 else ""
+    assert "@" not in encoded_part  # @ should be encoded as %40
+    assert ":" not in encoded_part  # : should be encoded as %3A
+    assert "%40" in encoded_part  # @ should be encoded as %40
+    assert "%3A" in encoded_part  # : should be encoded as %3A
     assert response.status_code == 404  # Wallet should not exist
 
 
