@@ -4,8 +4,9 @@ from eth_typing import ChecksumAddress
 from goat.classes.wallet_client_base import Balance, Signature
 from goat.types.chain import EvmChain
 from goat_wallets.evm import EVMWalletClient, EVMTransaction, EVMReadRequest, EVMTypedData, EVMReadResult
-from web3 import HTTPProvider, Web3
-from web3._utils.validation import validate_address
+from web3.main import Web3
+from web3.providers.rpc import HTTPProvider
+from web3.exceptions import InvalidAddress
 from eth_account.messages import encode_defunct
 from eth_account import Account
 
@@ -141,7 +142,6 @@ class SmartWalletClient(EVMWalletClient):
     def resolve_address(self, address: str) -> ChecksumAddress:
         """Resolve ENS name to address."""
         try:
-            validate_address(address)
             return w3_sync.to_checksum_address(address)
         except ValueError:
             if not self._ens:

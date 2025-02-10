@@ -20,7 +20,7 @@ class CrossmintWalletsAPI:
             base_url: Base URL for the Crossmint API
         """
         self.api_key = api_key
-        self.base_url = f"{base_url}/api/v1-alpha2"
+        self.base_url = base_url
     
     def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
         """Make an HTTP request to the Crossmint API.
@@ -69,7 +69,7 @@ class CrossmintWalletsAPI:
         payload = {
             "type": "evm-smart-wallet",
             "config": {
-                "adminSigner": admin_signer.dict() if admin_signer else None
+                "adminSigner": admin_signer.model_dump() if admin_signer else None
             }
         }
         

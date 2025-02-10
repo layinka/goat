@@ -1,7 +1,9 @@
 import pytest
 import os
-from web3 import Web3
+from web3.main import Web3
+from web3.providers.rpc import HTTPProvider
 from eth_account import Account
+from eth_account.messages import encode_defunct
 from goat_wallets.crossmint import SmartWalletClient
 from goat_wallets.crossmint.parameters import AdminSigner, CoreSignerType
 from .utils.helpers import (
@@ -278,7 +280,12 @@ def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypai
         assert Web3.is_address(address)
     except ValueError as e:
         # ENS provider might be unavailable, that's ok
-        assert "provider is not configured" in str(e).lower() or "could not resolve" in str(e).lower()
+        assert any(msg in str(e).lower() for msg in [
+            "provider is not configured",
+            "could not resolve",
+            "service temporarily unavailable",
+            "503 server error"
+        ])
 
 
 @pytest.mark.parametrize("invalid_options", [
@@ -295,15 +302,15 @@ def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_op
     wallet = smart_api.create_smart_wallet(admin_signer)
     options = {**test_wallet_options, **invalid_options}
     
-    with pytest.raises(Exception) as exc:
+    with pytest.raises((Exception, ValueError)) as exc:
         SmartWalletClient(
             wallet["address"],
             smart_api,
             options["chain"],
             {
-            "secretKey": test_keypair["secretKey"],
-            "address": test_keypair["address"]
-        },
+                "secretKey": test_keypair["secretKey"],
+                "address": test_keypair["address"]
+            },
             options["provider"],
             options["options"]["ensProvider"]
         )
