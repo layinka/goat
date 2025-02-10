@@ -114,9 +114,10 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         )
         
         # Create versioned transaction with empty signature
+        empty_sig = Signature(bytes([0] * Signature.LENGTH))  # Create empty signature using LENGTH constant
         transaction = VersionedTransaction.populate(
             message=message,
-            signatures=[Signature.default()]  # Empty signature placeholder
+            signatures=[empty_sig]  # Empty signature placeholder
         )
         
         # Serialize and encode transaction
