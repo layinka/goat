@@ -158,17 +158,11 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
         blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
     )
     
-    # Create MessageV0 and compile like TypeScript implementation
-    message_v0 = MessageV0(
-        header=message.header,
-        account_keys=message.account_keys,
-        recent_blockhash=message.recent_blockhash,
-        instructions=message.instructions,
-        address_table_lookups=[]
-    )
+    # Create unsigned transaction first
+    transaction = Transaction.new_unsigned(message)
     
-    # Create versioned transaction
-    versioned_transaction = VersionedTransaction(message_v0)
+    # Convert to versioned transaction
+    versioned_transaction = VersionedTransaction.from_legacy(transaction)
     
     # Serialize and encode
     serialized = base58.b58encode(bytes(versioned_transaction)).decode()

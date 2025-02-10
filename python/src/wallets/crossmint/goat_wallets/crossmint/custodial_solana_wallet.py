@@ -116,17 +116,11 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
         )
         
-        # Create MessageV0 and compile like TypeScript implementation
-        message_v0 = MessageV0(
-            header=message.header,
-            account_keys=message.account_keys,
-            recent_blockhash=message.recent_blockhash,
-            instructions=message.instructions,
-            address_table_lookups=[]
-        )
+        # Create unsigned transaction first
+        transaction = Transaction.new_unsigned(message)
         
-        # Create versioned transaction
-        versioned_transaction = VersionedTransaction(message_v0)
+        # Convert to versioned transaction
+        versioned_transaction = VersionedTransaction.from_legacy(transaction)
         
         # Serialize and encode transaction
         serialized = base58.b58encode(bytes(versioned_transaction)).decode()
@@ -138,11 +132,13 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         )
         
         # Wait for completion
+        print(f"\nTransaction submitted with ID: {response['id']}")
         while True:
             status = self._client.check_transaction_status(
                 self._locator,
                 response["id"]
             )
+            print(f"\nTransaction status: {status}")
             
             if status["status"] == "success":
                 return {
@@ -151,7 +147,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             
             if status["status"] == "failed":
                 raise ValueError(
-                    f"Transaction failed: {status.get('onChain', {}).get('txId')}"
+                    f"Transaction failed: {status.get('onChain', {}).get('txId')}, details: {status}"
                 )
             
             time.sleep(3)
