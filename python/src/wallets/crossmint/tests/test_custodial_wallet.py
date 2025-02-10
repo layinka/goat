@@ -123,7 +123,7 @@ def test_custodial_wallet_transaction(custodial_api, test_email, solana_connecti
                 is_writable=True
             )
         ],
-        data=bytes([2, 0, 0, 0]) + (1000000).to_bytes(8, 'little')  # Transfer 0.001 SOL
+        data=bytes([2, 0, 0, 0]) + (100000).to_bytes(8, 'little')  # Transfer 0.0001 SOL
     )
     
     # Send transaction
@@ -161,7 +161,7 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
                 is_writable=True
             )
         ],
-        data=bytes([2, 0, 0, 0]) + (1000000).to_bytes(8, 'little')  # Transfer 0.001 SOL
+        data=bytes([2, 0, 0, 0]) + (100000).to_bytes(8, 'little')  # Transfer 0.0001 SOL
     )
     # Create message with dummy payer key (will be replaced by API)
     dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
