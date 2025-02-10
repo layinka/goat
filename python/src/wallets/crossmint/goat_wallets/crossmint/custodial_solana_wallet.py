@@ -4,7 +4,7 @@ import base58
 from solders.instruction import Instruction
 from solders.pubkey import Pubkey
 from solders.message import Message
-from solders.transaction import VersionedTransaction
+from solders.transaction import Transaction, VersionedTransaction
 from solders.hash import Hash
 from solders.signature import Signature
 from solana.rpc.api import Client as SolanaClient
@@ -114,13 +114,11 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         )
         
         # Create transaction without signatures
-        transaction = VersionedTransaction(
-            message=message,
-            keypairs=[]  # No signatures, let the API handle signing
-        )
+        transaction = Transaction.new_unsigned(message)  # Create unsigned transaction
+        versioned_transaction = VersionedTransaction.from_legacy(transaction)  # Convert to versioned
         
         # Serialize and encode transaction
-        serialized = base58.b58encode(bytes(transaction)).decode()
+        serialized = base58.b58encode(bytes(versioned_transaction)).decode()
         
         # Create and submit transaction
         response = self._client.create_transaction_for_custodial_wallet(

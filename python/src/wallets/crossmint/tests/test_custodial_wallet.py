@@ -3,7 +3,7 @@ import base58
 from solders.instruction import Instruction, AccountMeta
 from solders.pubkey import Pubkey
 from solders.message import Message
-from solders.transaction import VersionedTransaction
+from solders.transaction import Transaction, VersionedTransaction
 from solders.hash import Hash
 from solders.signature import Signature
 from goat_wallets.crossmint import CustodialSolanaWalletClient
@@ -156,13 +156,11 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     )
     
     # Create transaction without signatures
-    transaction = VersionedTransaction(
-        message=message,
-        keypairs=[]  # No signatures, let the API handle signing
-    )
+    transaction = Transaction.new_unsigned(message)  # Create unsigned transaction
+    versioned_transaction = VersionedTransaction.from_legacy(transaction)  # Convert to versioned
     
     # Serialize and encode
-    serialized = base58.b58encode(bytes(transaction)).decode()
+    serialized = base58.b58encode(bytes(versioned_transaction)).decode()
     
     # Send raw transaction
     tx = client.send_raw_transaction(serialized)
