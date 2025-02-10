@@ -1,6 +1,6 @@
 import pytest
 from base58 import b58encode
-from solders.instruction import Instruction
+from solders.instruction import Instruction, AccountMeta
 from solders.pubkey import Pubkey
 from solders.message import Message
 from goat_wallets.crossmint import CustodialSolanaWalletClient
@@ -39,7 +39,7 @@ def test_custodial_wallet_creation_with_phone(custodial_api, test_phone, solana_
     assert wallet["type"] == "solana-mpc-wallet"
     
     # Verify retrieval
-    retrieved = custodial_api.get_wallet(f"phone:{test_phone}:solana-mpc-wallet")
+    retrieved = custodial_api.get_wallet(f"phoneNumber:{test_phone}:solana-mpc-wallet")
     compare_wallet_responses(wallet, retrieved)
     
     # Test client creation
@@ -103,11 +103,11 @@ def test_custodial_wallet_transaction(custodial_api, test_email, solana_connecti
     # Create a simple transfer instruction
     instruction = Instruction(
         program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
-        accounts=[{
-            "pubkey": Pubkey.from_string(wallet["address"]),
-            "is_signer": True,
-            "is_writable": True
-        }],
+        accounts=[AccountMeta(
+            pubkey=Pubkey.from_string(wallet["address"]),
+            is_signer=True,
+            is_writable=True
+        )],
         data=bytes()  # Empty for test
     )
     
@@ -134,11 +134,11 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
     # Create a simple message
     instruction = Instruction(
         program_id=Pubkey.from_string("11111111111111111111111111111111"),  # System program
-        accounts=[{
-            "pubkey": Pubkey.from_string(wallet["address"]),
-            "is_signer": True,
-            "is_writable": True
-        }],
+        accounts=[AccountMeta(
+            pubkey=Pubkey.from_string(wallet["address"]),
+            is_signer=True,
+            is_writable=True
+        )],
         data=bytes()  # Empty for test
     )
     message = Message(

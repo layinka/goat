@@ -27,22 +27,21 @@ def test_base_url_configuration(custodial_api):
 
 def test_url_encoding_email(custodial_api, test_email):
     """Test URL parameter encoding with email."""
-    encoded = quote(test_email)
+    encoded = quote(f"email:{test_email}:solana-mpc-wallet")
     with pytest.raises(Exception) as exc:
         custodial_api.get_wallet_by_email(test_email, "solana")
     # Should raise not found error, but URL should be properly encoded
     assert encoded in str(exc.value)
-    assert ":" not in str(exc.value).replace("email:", "").replace(":solana-mpc-wallet", "")
 
 
 def test_url_encoding_special_chars(custodial_api):
     """Test URL parameter encoding with special characters."""
     special_chars = "test:user+@example.com"
+    encoded = quote(f"email:{special_chars}:solana-mpc-wallet")
     with pytest.raises(Exception) as exc:
         custodial_api.get_wallet_by_email(special_chars, "solana")
     # Verify the special characters were properly encoded
-    assert "+" not in str(exc.value)
-    assert ":" not in str(exc.value)
+    assert encoded in str(exc.value)
 
 
 def test_error_handling_not_found(custodial_api):

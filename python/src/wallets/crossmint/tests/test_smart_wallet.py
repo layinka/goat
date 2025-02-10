@@ -19,9 +19,9 @@ def test_wallet_options():
     """Fixture providing test wallet options."""
     return {
         "chain": "base-sepolia",
-        "provider": "https://rpc.sepolia.org",
+        "provider": "https://base-sepolia.g.alchemy.com/v2/demo",
         "options": {
-            "ensProvider": "https://rpc.sepolia.org"
+            "ensProvider": "https://eth-sepolia.g.alchemy.com/v2/demo"
         }
     }
 
