@@ -33,10 +33,14 @@ def test_keypair():
     }
 
 
-def test_smart_wallet_creation(smart_api):
+def test_smart_wallet_creation(smart_api, test_keypair):
     """Test smart wallet creation and retrieval."""
     # Create wallet
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
     
@@ -47,30 +51,32 @@ def test_smart_wallet_creation(smart_api):
 
 def test_smart_wallet_with_admin_signer(smart_api, test_keypair):
     """Test smart wallet creation with admin signer."""
-    wallet = smart_api.create_smart_wallet({
-        "adminSigner": {
-            "type": "evm-keypair",
-            "address": test_keypair["address"]
-        }
-    })
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
 
 
-def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options):
+def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options, test_keypair):
     """Test smart wallet creation with email."""
-    options = {
-        **test_wallet_options,
-        "linkedUser": {"email": test_email}
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
     }
-    wallet = smart_api.create_smart_wallet()
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
-        options["chain"],
-        test_keypair,
-        options["provider"],
-        options["options"]["ensProvider"]
+        test_wallet_options["chain"],
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
+        test_wallet_options["provider"],
+        test_wallet_options["options"]["ensProvider"]
     )
     assert client.get_address() == wallet["address"]
 
@@ -78,12 +84,19 @@ def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options):
 def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_message, test_keypair):
     """Test message signing with smart wallet."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -99,12 +112,19 @@ def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_messa
 def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_transaction, test_keypair):
     """Test transaction sending with smart wallet."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -119,12 +139,19 @@ def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_trans
 def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_keypair):
     """Test sending batch transactions."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -151,12 +178,19 @@ def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_ke
 def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair):
     """Test reading from a smart contract."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -187,12 +221,19 @@ def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair
 def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
     """Test getting wallet balance."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -212,12 +253,19 @@ def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
 def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypair):
     """Test ENS name resolution."""
     # Create wallet and client
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
         test_wallet_options["chain"],
-        test_keypair,
+        {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
         test_wallet_options["provider"],
         test_wallet_options["options"]["ensProvider"]
     )
@@ -239,7 +287,11 @@ def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypai
 ])
 def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_options, test_keypair):
     """Test error handling with invalid options."""
-    wallet = smart_api.create_smart_wallet()
+    admin_signer = {
+        "type": "evm-keypair",
+        "address": test_keypair["address"]
+    }
+    wallet = smart_api.create_smart_wallet(admin_signer)
     options = {**test_wallet_options, **invalid_options}
     
     with pytest.raises(Exception) as exc:
@@ -247,7 +299,10 @@ def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_op
             wallet["address"],
             smart_api,
             options["chain"],
-            test_keypair,
+            {
+            "secretKey": test_keypair["secretKey"],
+            "address": test_keypair["address"]
+        },
             options["provider"],
             options["options"]["ensProvider"]
         )

@@ -16,10 +16,10 @@ def test_custodial_wallet_creation_with_email(custodial_api, test_email, solana_
     """Test custodial wallet creation with email."""
     # Create wallet
     wallet = custodial_api.create_custodial_wallet(test_email)
-    assert wallet["type"] == "solana-custodial-wallet"
+    assert wallet["type"] == "solana-mpc-wallet"
     
     # Verify retrieval
-    retrieved = custodial_api.get_wallet(f"email:{test_email}:solana-custodial-wallet")
+    retrieved = custodial_api.get_wallet(f"email:{test_email}:solana-mpc-wallet")
     compare_wallet_responses(wallet, retrieved)
     
     # Test client creation
