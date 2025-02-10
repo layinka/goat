@@ -149,9 +149,11 @@ def test_custodial_wallet_raw_transaction(custodial_api, test_email, solana_conn
         )],
         data=bytes()  # Empty for test
     )
+    # Create message with dummy payer key (will be replaced by API)
+    dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
     message = Message.new_with_blockhash(
         instructions=[instruction],
-        payer=Pubkey.from_string(wallet["address"]),
+        payer=dummy_payer,  # Use dummy payer key
         blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
     )
     

@@ -106,14 +106,15 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             )
             instructions.append(instruction)
         
-        # Create legacy message
+        # Create message with dummy payer key (will be replaced by API)
+        dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
         message = Message.new_with_blockhash(
             instructions=instructions,
-            payer=Pubkey.from_string(self._address),
+            payer=dummy_payer,  # Use dummy payer key
             blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
         )
         
-        # Create transaction without signatures
+        # Create versioned transaction without signatures
         transaction = Transaction.new_unsigned(message)  # Create unsigned transaction
         versioned_transaction = VersionedTransaction.from_legacy(transaction)  # Convert to versioned
         
