@@ -1,5 +1,5 @@
 import time
-from typing import Dict, List, Optional, TypedDict, Union, cast
+from typing import Dict, List, Optional, TypeVar, TypedDict, Union, cast
 from eth_typing import ChecksumAddress
 from goat.classes.wallet_client_base import Balance, Signature
 from goat.types.chain import EvmChain
@@ -14,7 +14,7 @@ from .api_client import CrossmintWalletsAPI, Call
 from ens import ENS
 
 from .api_client import Call
-from .evm_smart_wallet import SmartWalletClient as EVMSmartWalletClient
+from .evm_smart_wallet import Signer, SmartWalletClient as EVMSmartWalletClient
 from .evm_smart_wallet import smart_wallet_factory as evm_smart_wallet_factory
 from .solana_smart_wallet import SolanaSmartWalletClient
 from .solana_smart_wallet_factory import solana_smart_wallet_factory

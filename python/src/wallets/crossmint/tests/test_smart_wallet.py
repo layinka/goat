@@ -4,7 +4,7 @@ from web3.main import Web3
 from web3.providers.rpc import HTTPProvider
 from eth_account import Account
 from eth_account.messages import encode_defunct
-from goat_wallets.crossmint import SmartWalletClient
+from goat_wallets.crossmint.smart_wallet import SmartWalletClient
 from goat_wallets.crossmint.parameters import AdminSigner, CoreSignerType
 from .utils.helpers import (
     compare_wallet_responses,

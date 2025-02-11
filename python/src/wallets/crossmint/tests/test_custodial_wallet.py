@@ -6,7 +6,7 @@ from solders.message import Message, MessageV0
 from solders.transaction import Transaction, VersionedTransaction
 from solders.hash import Hash
 from solders.signature import Signature
-from goat_wallets.crossmint import CustodialSolanaWalletClient
+from goat_wallets.crossmint.custodial_solana_wallet import CustodialSolanaWalletClient
 from .utils.helpers import (
     compare_wallet_responses,
     compare_transaction_responses,
