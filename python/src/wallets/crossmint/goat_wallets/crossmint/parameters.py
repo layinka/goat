@@ -37,7 +37,7 @@ class CreateCustodialWalletParameters(BaseModel):
 
 class CreateWalletRequest(BaseModel):
     """Request parameters for wallet creation."""
-    type: str = Field(description="Wallet type (evm-smart-wallet or solana-custodial-wallet)")
+    type: str = Field(description="Wallet type (evm-smart-wallet or solana-mpc-wallet)")
     config: Optional[Dict[str, Any]] = Field(
         None,
         description="Optional configuration including admin signer"

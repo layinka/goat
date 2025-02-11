@@ -18,10 +18,10 @@ def get_locator(params: Dict) -> str:
     if "address" in params:
         return params["address"]
     if "email" in params:
-        return f"email:{params['email']}:solana-custodial-wallet"
+        return f"email:{params['email']}:solana-mpc-wallet"
     if "phone" in params:
-        return f"phone:{params['phone']}:solana-custodial-wallet"
-    return f"userId:{params['userId']}:solana-custodial-wallet"
+        return f"phone:{params['phone']}:solana-mpc-wallet"
+    return f"userId:{params['userId']}:solana-mpc-wallet"
 
 
 class CustodialSolanaWalletClient(SolanaWalletClient):

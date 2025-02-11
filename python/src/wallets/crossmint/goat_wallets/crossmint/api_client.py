@@ -118,7 +118,7 @@ class CrossmintWalletsAPI:
             linked_user = f"userId:{linked_user}"
             
         payload = {
-            "type": "solana-custodial-wallet",
+            "type": "solana-mpc-wallet",
             "linkedUser": linked_user
         }
         
