@@ -150,7 +150,7 @@ class TestCrossmintWalletsAPI:
         mock_response.ok = True
         mock_response.json.return_value = {
             "id": "tx123",
-            "walletType": "solana-custodial-wallet",
+            "walletType": "solana-mpc-wallet",
             "status": "pending",
             "params": {
                 "transaction": "base58encodedtransaction"
@@ -183,7 +183,7 @@ class TestCrossmintWalletsAPI:
         mock_response.ok = True
         mock_response.json.return_value = {
             "id": "sig123",
-            "walletType": "solana-custodial-wallet",
+            "walletType": "solana-mpc-wallet",
             "status": "completed",
             "outputSignature": "solanaSignature",
             "approvals": {
