@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 from .parameters import (
-    SignTypedDataRequest, AdminSigner, Call
+    SignTypedDataRequest, AdminSigner, Call, CoreSignerType
 )
 import requests
 import json
@@ -284,7 +284,7 @@ class CrossmintWalletsAPI:
     def create_transaction_for_smart_wallet(
         self,
         wallet_address: str,
-        calls: List[Call],
+        calls: List[Union[Call, Dict[str, str]]],
         chain: str,
         signer: Optional[str] = None
     ) -> Dict[str, Any]:
@@ -292,7 +292,7 @@ class CrossmintWalletsAPI:
         
         Args:
             wallet_address: Wallet address
-            calls: List of contract calls
+            calls: List of contract calls or dictionaries
             chain: Chain identifier
             signer: Optional signer address
         
@@ -300,13 +300,23 @@ class CrossmintWalletsAPI:
             Transaction creation response
         """
         endpoint = f"/wallets/{quote(wallet_address)}/transactions"
+        
+        # Convert dictionaries to Call models if needed
+        formatted_calls = []
+        for call in calls:
+            if isinstance(call, dict):
+                formatted_calls.append(Call(**call).model_dump(by_alias=True))
+            else:
+                formatted_calls.append(call.model_dump(by_alias=True))
+        
         payload = {
             "params": {
-                "calls": [call.model_dump() for call in calls],
-                "chain": chain,
-                "signer": f"evm-keypair:{signer}" if signer else None
+                "calls": formatted_calls,
+                "chain": chain
             }
         }
+        if signer:
+            payload["params"]["signer"] = f"evm-keypair:{signer}"
         
         return self._request(endpoint, method="POST", json=payload)
     
@@ -314,20 +324,32 @@ class CrossmintWalletsAPI:
         self,
         locator: str,
         transaction_id: str,
-        approvals: List[Dict[str, str]]
+        approvals: List[Union[Dict[str, str], AdminSigner]]
     ) -> Dict[str, Any]:
         """Approve a transaction.
         
         Args:
             locator: Wallet locator string
             transaction_id: ID of the transaction
-            approvals: List of approval objects with signer and signature
+            approvals: List of approval objects or AdminSigner instances
         
         Returns:
             Approval response
         """
         endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}/approvals"
-        payload = {"approvals": approvals}
+        
+        formatted_approvals = []
+        for approval in approvals:
+            if isinstance(approval, AdminSigner):
+                formatted_approvals.append({
+                    "signer": f"admin:{approval.address}",
+                    "signature": approval.signature,
+                    "chain": approval.chain
+                })
+            else:
+                formatted_approvals.append(approval)
+        
+        payload = {"approvals": formatted_approvals}
         
         return self._request(endpoint, method="POST", json=payload)
     
@@ -387,7 +409,7 @@ class CrossmintWalletsAPI:
         }
         return self._request(endpoint, method="POST", json=payload)
 
-    def create_wallet_for_twitter_user(self, username: str, chain: str) -> Dict[str, Any]:
+    def create_wallet_for_twitter(self, username: str, chain: str) -> Dict[str, Any]:
         """Create a wallet for a Twitter user.
         
         Args:
@@ -467,11 +489,12 @@ class CrossmintWalletsAPI:
         }
         return self._request(endpoint, method="POST", json=payload)
 
-    def wait_for_action(self, action_id: str, max_attempts: int = 60) -> Dict[str, Any]:
+    def wait_for_action(self, action_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
         """Wait for an action to complete.
         
         Args:
             action_id: Action ID to wait for
+            interval: Time to wait between attempts in seconds
             max_attempts: Maximum number of attempts to check status
         
         Returns:
@@ -489,6 +512,109 @@ class CrossmintWalletsAPI:
             if response.get("status") == "succeeded":
                 return response
                 
-            time.sleep(1)
+            time.sleep(interval)
             
-        raise Exception(f"Timed out waiting for action {action_id} after {attempts} attempts")
+        raise Exception("Timed out waiting for action")
+
+    def wait_for_transaction(self, locator: str, transaction_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
+        """Wait for a transaction to complete.
+        
+        Args:
+            locator: Wallet locator string
+            transaction_id: Transaction ID to wait for
+            interval: Time to wait between attempts in seconds
+            max_attempts: Maximum number of attempts to check status
+        
+        Returns:
+            Transaction response when completed
+        
+        Raises:
+            Exception: If transaction times out or fails
+        """
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            response = self.check_transaction_status(locator, transaction_id)
+            
+            if response["status"] in ["success", "completed", "failed"]:
+                return response
+                
+            time.sleep(interval)
+            
+        raise Exception("Timed out waiting for transaction")
+
+    def wait_for_signature(self, locator: str, signature_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
+        """Wait for a signature request to complete.
+        
+        Args:
+            locator: Wallet locator string
+            signature_id: Signature ID to wait for
+            interval: Time to wait between attempts in seconds
+            max_attempts: Maximum number of attempts to check status
+        
+        Returns:
+            Signature response when completed
+        
+        Raises:
+            Exception: If signature request times out or fails
+        """
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            response = self.check_signature_status(signature_id, locator)
+            
+            if response["status"] in ["success", "completed", "failed"]:
+                return response
+                
+            time.sleep(interval)
+            
+        raise Exception("Timed out waiting for signature")
+
+    def create_wallet(self, wallet_type: str, linked_user: Optional[str] = None, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Create a new wallet.
+        
+        Args:
+            wallet_type: Type of wallet to create
+            linked_user: Optional user identifier to link the wallet to
+            config: Optional wallet configuration
+        
+        Returns:
+            Created wallet details
+        """
+        payload = {
+            "type": wallet_type,
+            "linkedUser": linked_user
+        }
+        if config:
+            payload["config"] = config
+        return self._request("/wallets", method="POST", json=payload)
+
+    def create_wallet_for_phone(self, phone: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for a phone number.
+        
+        Args:
+            phone: Phone number
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        return self.create_wallet(
+            wallet_type=f"{chain}-mpc-wallet",
+            linked_user=f"phone:{phone}"
+        )
+
+    def create_wallet_for_user_id(self, user_id: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for a user ID.
+        
+        Args:
+            user_id: User identifier
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        return self.create_wallet(
+            wallet_type=f"{chain}-mpc-wallet",
+            linked_user=f"userId:{user_id}"
+        )

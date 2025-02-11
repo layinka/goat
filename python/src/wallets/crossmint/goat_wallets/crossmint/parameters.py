@@ -18,6 +18,8 @@ class AdminSigner(BaseModel):
     type: CoreSignerType
     address: Optional[str] = None
     locator: Optional[str] = None
+    signature: Optional[str] = None
+    chain: Optional[str] = None
 
 
 class CreateSmartWalletParameters(BaseModel):
@@ -64,10 +66,17 @@ class Call(BaseModel):
     data: str
 
 
+class EVMTypedData(BaseModel):
+    """EVM typed data structure for signing."""
+    types: Dict[str, List[Dict[str, str]]]
+    primaryType: str
+    domain: Dict[str, Any]
+    message: Dict[str, Any]
+
 class TransactionParams(BaseModel):
     """Parameters for transaction creation."""
     calls: Optional[List[Call]] = None
-    chain: Optional[str] = None
+    chain: Optional[Literal["ethereum", "polygon", "avalanche", "arbitrum", "optimism", "base", "sepolia"]] = None
     signer: Optional[str] = None
     transaction: Optional[str] = None
     signers: Optional[List[str]] = None
@@ -98,7 +107,15 @@ class SignMessageRequest(BaseModel):
 class SignTypedDataRequest(BaseModel):
     """Request parameters for typed data signing."""
     type: Literal["evm-typed-data"]
-    params: Dict[str, Any] = Field(description="Parameters including typed data and chain")
+    params: Dict[str, Any] = Field(
+        ...,
+        description="Parameters including typed data and chain",
+        example={
+            "typedData": "EVMTypedData",
+            "chain": "string",
+            "signer": "string"
+        }
+    )
 
 
 class SignatureResponse(BaseModel):
