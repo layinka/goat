@@ -118,7 +118,7 @@ class CrossmintWalletsAPI:
             linked_user = f"userId:{linked_user}"
             
         payload = {
-            "type": "solana-mpc-wallet",
+            "type": "solana-custodial-wallet",
             "linkedUser": linked_user
         }
         
@@ -272,13 +272,6 @@ class CrossmintWalletsAPI:
             Transaction creation response
         """
         # Format locator to use correct wallet type
-        if "@" in locator:
-            locator = f"email:{locator}:solana-mpc-wallet"
-        elif locator.startswith("+"):
-            locator = f"phoneNumber:{locator}:solana-mpc-wallet"
-        else:
-            locator = f"userId:{locator}:solana-mpc-wallet"
-        
         endpoint = f"/wallets/{quote(locator)}/transactions"
         payload = {
             "params": {
