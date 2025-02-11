@@ -23,12 +23,19 @@ class CrossmintWalletsAPI:
         self.api_key = api_key
         self.base_url = f"{base_url}/api/v1-alpha2"
     
-    def _request(self, endpoint: str, method: str = "GET", **kwargs) -> Dict[str, Any]:
+    def _request(
+        self,
+        endpoint: str,
+        method: str = "GET",
+        timeout: Optional[float] = None,
+        **kwargs
+    ) -> Dict[str, Any]:
         """Make an HTTP request to the Crossmint API.
         
         Args:
             endpoint: API endpoint (relative to base_url)
             method: HTTP method to use
+            timeout: Optional request timeout in seconds
             **kwargs: Additional arguments to pass to requests
         
         Returns:
@@ -45,6 +52,7 @@ class CrossmintWalletsAPI:
         }
         
         try:
+            kwargs["timeout"] = timeout if timeout is not None else 30
             response = requests.request(method, url, headers=headers, **kwargs)
             response_body = response.json()
             
@@ -62,20 +70,32 @@ class CrossmintWalletsAPI:
         self,
         wallet_type: WalletType,
         admin_signer: Optional[AdminSigner] = None,
-        linked_user: Optional[str] = None
+        email: Optional[str] = None,
+        user_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a new smart wallet.
         
         Args:
             wallet_type: Type of smart wallet (EVM_SMART_WALLET or SOLANA_SMART_WALLET)
             admin_signer: Optional admin signer configuration
-            linked_user: Optional user identifier to link the wallet to
+            email: Optional email to link the wallet to
+            user_id: Optional user ID to link the wallet to
         
         Returns:
             Wallet creation response
+        
+        Raises:
+            ValueError: If neither email nor user_id is provided
         """
+        if not email and not user_id:
+            raise ValueError("Either email or user_id must be provided")
+            
+        linked_user = f"email:{email}" if email else f"userId:{user_id}"
         payload = {
             "type": wallet_type.value,
+            "config": {
+                "adminSigner": admin_signer.model_dump() if admin_signer else None
+            },
             "linkedUser": linked_user
         }
         
@@ -88,13 +108,21 @@ class CrossmintWalletsAPI:
         """Create a new Solana custodial wallet.
         
         Args:
-            linked_user: User identifier to link the wallet to
+            linked_user: User identifier (email, phone, or userId)
         
         Returns:
             Wallet creation response
         """
+        # Format linkedUser based on type
+        if "@" in linked_user:
+            linked_user = f"email:{linked_user}"
+        elif linked_user.startswith("+"):
+            linked_user = f"phoneNumber:{linked_user}"
+        else:
+            linked_user = f"userId:{linked_user}"
+            
         payload = {
-            "type": "solana-custodial-wallet",
+            "type": "solana-mpc-wallet",
             "linkedUser": linked_user
         }
         
@@ -261,12 +289,13 @@ class CrossmintWalletsAPI:
         """Create a transaction using a Solana custodial wallet.
         
         Args:
-            locator: Wallet locator string
+            locator: Wallet locator string (email:address, phoneNumber:address, or userId:address)
             transaction: Encoded transaction data
         
         Returns:
             Transaction creation response
         """
+        # Format locator to use correct wallet type
         endpoint = f"/wallets/{quote(locator)}/transactions"
         payload = {
             "params": {
@@ -339,7 +368,7 @@ class CrossmintWalletsAPI:
     def create_transaction_for_evm_smart_wallet(
         self,
         wallet_address: str,
-        calls: List[Call],
+        calls: List[Union[Call, Dict[str, str]]],
         chain: str,
         signer: Optional[str] = None
     ) -> Dict[str, Any]:
@@ -347,7 +376,7 @@ class CrossmintWalletsAPI:
         
         Args:
             wallet_address: Wallet address
-            calls: List of contract calls
+            calls: List of contract calls or dictionaries
             chain: Chain identifier
             signer: Optional signer address
             
@@ -355,13 +384,24 @@ class CrossmintWalletsAPI:
             Transaction creation response
         """
         endpoint = f"/wallets/{quote(wallet_address)}/transactions"
+        
+        # Convert dictionaries to Call models if needed
+        formatted_calls = []
+        for call in calls:
+            if isinstance(call, dict):
+                formatted_calls.append(Call(**call).model_dump(by_alias=True))
+            else:
+                formatted_calls.append(call.model_dump(by_alias=True))
+        
         payload = {
             "params": {
-                "calls": [call.model_dump() for call in calls],
                 "chain": chain,
-                "signer": f"evm-keypair:{signer}" if signer else None
+                "signer": f"evm-keypair:{signer}" if signer else None,
+                "calls": formatted_calls
             }
         }
+        if signer:
+            payload["params"]["signer"] = f"evm-keypair:{signer}"
         
         return self._request(endpoint, method="POST", json=payload)
     
@@ -369,33 +409,32 @@ class CrossmintWalletsAPI:
         self,
         locator: str,
         transaction_id: str,
-        signature: Optional[str] = None,
-        signer: Optional[str] = None,
-        approvals: Optional[List[Dict[str, str]]] = None
+        approvals: List[Union[Dict[str, str], AdminSigner]]
     ) -> Dict[str, Any]:
         """Approve a transaction.
         
         Args:
             locator: Wallet locator string
             transaction_id: ID of the transaction
-            signature: Optional signature for simple approval
-            signer: Optional signer locator (defaults to admin signer)
-            approvals: Optional list of approval objects with signer and signature
+            approvals: List of approval objects or AdminSigner instances
         
         Returns:
             Approval response
         """
-        endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}/approve"
-        payload = {}
+        endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}/approvals"
         
-        if approvals:
-            endpoint = f"/wallets/{quote(locator)}/transactions/{quote(transaction_id)}/approvals"
-            payload = {"approvals": approvals}
-        else:
-            if signature:
-                payload["signature"] = signature
-            if signer:
-                payload["signer"] = signer
+        formatted_approvals = []
+        for approval in approvals:
+            if isinstance(approval, AdminSigner):
+                formatted_approvals.append({
+                    "signer": f"admin:{approval.address}",
+                    "signature": approval.signature,
+                    "chain": approval.chain
+                })
+            else:
+                formatted_approvals.append(approval)
+        
+        payload = {"approvals": formatted_approvals}
         
         return self._request(endpoint, method="POST", json=payload)
     
@@ -455,7 +494,7 @@ class CrossmintWalletsAPI:
         }
         return self._request(endpoint, method="POST", json=payload)
 
-    def create_wallet_for_twitter_user(self, username: str, chain: str) -> Dict[str, Any]:
+    def create_wallet_for_twitter(self, username: str, chain: str) -> Dict[str, Any]:
         """Create a wallet for a Twitter user.
         
         Args:
@@ -502,18 +541,20 @@ class CrossmintWalletsAPI:
         endpoint = f"/wallets/x:{username}:{chain}-mpc-wallet"
         return self._request(endpoint)
 
-    def get_wallet_by_email(self, email: str, chain: str) -> Dict[str, Any]:
+    def get_wallet_by_email(self, email: str, chain: str, timeout: Optional[float] = None) -> Dict[str, Any]:
         """Get wallet details by email.
         
         Args:
             email: Email address
             chain: Chain identifier
+            timeout: Optional request timeout in seconds
         
         Returns:
             Wallet details
         """
-        endpoint = f"/wallets/email:{email}:{chain}-mpc-wallet"
-        return self._request(endpoint)
+        locator = f"email:{email}:{chain}-mpc-wallet"
+        endpoint = f"/wallets/{quote(locator)}"
+        return self._request(endpoint, timeout=timeout)
 
     def request_faucet_tokens(self, wallet_address: str, chain_id: str) -> Dict[str, Any]:
         """Request tokens from faucet.
@@ -583,11 +624,12 @@ class CrossmintWalletsAPI:
         endpoint = f"/wallets/{quote(wallet_locator)}/signers/{quote(signer_locator)}"
         return self._request(endpoint, method="GET")
     
-    def wait_for_action(self, action_id: str, max_attempts: int = 60) -> Dict[str, Any]:
+    def wait_for_action(self, action_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
         """Wait for an action to complete.
         
         Args:
             action_id: Action ID to wait for
+            interval: Time to wait between attempts in seconds
             max_attempts: Maximum number of attempts to check status
         
         Returns:
@@ -605,6 +647,109 @@ class CrossmintWalletsAPI:
             if response.get("status") == "succeeded":
                 return response
                 
-            time.sleep(1)
+            time.sleep(interval)
             
-        raise Exception(f"Timed out waiting for action {action_id} after {attempts} attempts")
+        raise Exception("Timed out waiting for action")
+
+    def wait_for_transaction(self, locator: str, transaction_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
+        """Wait for a transaction to complete.
+        
+        Args:
+            locator: Wallet locator string
+            transaction_id: Transaction ID to wait for
+            interval: Time to wait between attempts in seconds
+            max_attempts: Maximum number of attempts to check status
+        
+        Returns:
+            Transaction response when completed
+        
+        Raises:
+            Exception: If transaction times out or fails
+        """
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            response = self.check_transaction_status(locator, transaction_id)
+            
+            if response["status"] in ["success", "completed", "failed"]:
+                return response
+                
+            time.sleep(interval)
+            
+        raise Exception("Timed out waiting for transaction")
+
+    def wait_for_signature(self, locator: str, signature_id: str, interval: float = 1.0, max_attempts: int = 60) -> Dict[str, Any]:
+        """Wait for a signature request to complete.
+        
+        Args:
+            locator: Wallet locator string
+            signature_id: Signature ID to wait for
+            interval: Time to wait between attempts in seconds
+            max_attempts: Maximum number of attempts to check status
+        
+        Returns:
+            Signature response when completed
+        
+        Raises:
+            Exception: If signature request times out or fails
+        """
+        attempts = 0
+        while attempts < max_attempts:
+            attempts += 1
+            response = self.check_signature_status(signature_id, locator)
+            
+            if response["status"] in ["success", "completed", "failed"]:
+                return response
+                
+            time.sleep(interval)
+            
+        raise Exception("Timed out waiting for signature")
+
+    def create_wallet(self, wallet_type: str, linked_user: Optional[str] = None, config: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Create a new wallet.
+        
+        Args:
+            wallet_type: Type of wallet to create
+            linked_user: Optional user identifier to link the wallet to
+            config: Optional wallet configuration
+        
+        Returns:
+            Created wallet details
+        """
+        payload = {
+            "type": wallet_type,
+            "linkedUser": linked_user
+        }
+        if config:
+            payload["config"] = config
+        return self._request("/wallets", method="POST", json=payload)
+
+    def create_wallet_for_phone(self, phone: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for a phone number.
+        
+        Args:
+            phone: Phone number
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        return self.create_wallet(
+            wallet_type=f"{chain}-mpc-wallet",
+            linked_user=f"phone:{phone}"
+        )
+
+    def create_wallet_for_user_id(self, user_id: str, chain: str) -> Dict[str, Any]:
+        """Create a wallet for a user ID.
+        
+        Args:
+            user_id: User identifier
+            chain: Chain identifier
+        
+        Returns:
+            Created wallet details
+        """
+        return self.create_wallet(
+            wallet_type=f"{chain}-mpc-wallet",
+            linked_user=f"userId:{user_id}"
+        )

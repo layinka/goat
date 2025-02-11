@@ -3,7 +3,10 @@ from typing import Dict
 import base58
 from solders.instruction import Instruction
 from solders.pubkey import Pubkey
-from solders.message import Message
+from solders.message import Message, MessageV0
+from solders.transaction import Transaction, VersionedTransaction
+from solders.hash import Hash
+from solders.signature import Signature
 from solana.rpc.api import Client as SolanaClient
 from goat.classes.wallet_client_base import Balance, Signature
 from goat_wallets.solana import SolanaWalletClient, SolanaTransaction
@@ -15,12 +18,10 @@ def get_custodial_locator(params: Dict) -> str:
     """Get custodial wallet locator from parameters."""
     linked_user = None
     if "email" in params:
-        linked_user = {"email": params["email"]}
-    elif "phone" in params:
-        linked_user = {"phone": params["phone"]}
-    elif "userId" in params:
-        linked_user = {"userId": params["userId"]}
-    return get_locator(params.get("address"), linked_user, "solana-custodial-wallet")
+        return f"email:{params['email']}:solana-mpc-wallet"
+    if "phone" in params:
+        return f"phone:{params['phone']}:solana-mpc-wallet"
+    return f"userId:{params['userId']}:solana-mpc-wallet"
 
 
 class CustodialSolanaWalletClient(SolanaWalletClient):
@@ -105,14 +106,24 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             )
             instructions.append(instruction)
         
-        # Create message using solders Message
-        message = Message(
+        # Create message with dummy payer key (will be replaced by API)
+        dummy_payer = Pubkey.from_string("11111111111111111111111111111112")  # Match TypeScript implementation
+        
+        # Create message like TypeScript implementation
+        message = Message.new_with_blockhash(
             instructions=instructions,
-            payer=Pubkey.from_string(self._address),
+            payer=dummy_payer,  # Use dummy payer key
+            blockhash=Hash.from_string("11111111111111111111111111111111")  # Match TypeScript implementation
         )
         
+        # Create unsigned transaction first
+        transaction = Transaction.new_unsigned(message)
+        
+        # Convert to versioned transaction
+        versioned_transaction = VersionedTransaction.from_legacy(transaction)
+        
         # Serialize and encode transaction
-        serialized = base58.b58encode(bytes(message)).decode()
+        serialized = base58.b58encode(bytes(versioned_transaction)).decode()
         
         # Create and submit transaction
         response = self._client.create_transaction_for_custodial_wallet(
@@ -121,20 +132,23 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
         )
         
         # Wait for completion
+        print(f"\nTransaction submitted with ID: {response['id']}")
         while True:
             status = self._client.check_transaction_status(
                 self._locator,
                 response["id"]
             )
+            print(f"\nTransaction status: {status}")
             
             if status["status"] == "success":
                 return {
+                    "status": "success",
                     "hash": status.get("onChain", {}).get("txId", "")
                 }
             
             if status["status"] == "failed":
                 raise ValueError(
-                    f"Transaction failed: {status.get('onChain', {}).get('txId')}"
+                    f"Transaction failed: {status.get('onChain', {}).get('txId')}, details: {status}"
                 )
             
             time.sleep(3)
@@ -181,6 +195,7 @@ class CustodialSolanaWalletClient(SolanaWalletClient):
             
             if status["status"] == "success":
                 return {
+                    "status": "success",
                     "hash": status.get("onChain", {}).get("txId", "")
                 }
             
