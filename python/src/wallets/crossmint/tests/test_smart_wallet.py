@@ -5,7 +5,7 @@ from web3.providers.rpc import HTTPProvider
 from eth_account import Account
 from eth_account.messages import encode_defunct
 from goat_wallets.crossmint.smart_wallet import SmartWalletClient
-from goat_wallets.crossmint.parameters import AdminSigner, CoreSignerType
+from goat_wallets.crossmint.parameters import AdminSigner, CoreSignerType, WalletType
 from .utils.helpers import (
     compare_wallet_responses,
     compare_transaction_responses,
@@ -43,7 +43,11 @@ def test_smart_wallet_creation(smart_api, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
     
@@ -58,7 +62,11 @@ def test_smart_wallet_with_admin_signer(smart_api, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     assert wallet["address"].startswith("0x")
     assert wallet["type"] == "evm-smart-wallet"
 
@@ -69,7 +77,11 @@ def test_smart_wallet_with_email(smart_api, test_email, test_wallet_options, tes
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -100,7 +112,11 @@ def test_smart_wallet_message_signing(smart_api, test_wallet_options, test_messa
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -137,7 +153,11 @@ def test_smart_wallet_transaction(smart_api, test_wallet_options, test_evm_trans
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -173,7 +193,11 @@ def test_smart_wallet_batch_transactions(smart_api, test_wallet_options, test_ke
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -221,7 +245,11 @@ def test_smart_wallet_read_contract(smart_api, test_wallet_options, test_keypair
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     client = SmartWalletClient(
         wallet["address"],
         smart_api,
@@ -264,7 +292,11 @@ def test_smart_wallet_balance(smart_api, test_wallet_options, test_keypair):
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -305,7 +337,11 @@ def test_smart_wallet_ens_resolution(smart_api, test_wallet_options, test_keypai
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     
     try:
         client = SmartWalletClient(
@@ -356,7 +392,11 @@ def test_smart_wallet_invalid_options(smart_api, invalid_options, test_wallet_op
         type=CoreSignerType.EVM_KEYPAIR,
         address=test_keypair["address"]
     )
-    wallet = smart_api.create_smart_wallet(admin_signer, email="test@example.com")
+    wallet = smart_api.create_wallet(
+        wallet_type=WalletType.EVM_SMART_WALLET,
+        linked_user="email:test@example.com",
+        config={"adminSigner": admin_signer.model_dump()}
+    )
     options = {**test_wallet_options, **invalid_options}
     
     with pytest.raises((Exception, ValueError)) as exc:

@@ -83,6 +83,64 @@ describe("CrossmintWalletsAPI", () => {
             });
         });
 
+        describe("Solana Smart Wallet Operations", () => {
+            it("should create a Solana smart wallet", async () => {
+                const mockResponse = {
+                    type: "solana-smart-wallet",
+                    address: "solana123",
+                    linkedUser: "user@test.com",
+                    createdAt: "2024-01-01",
+                };
+                mockFetchResponse(mockResponse);
+
+                const result = await api.createSmartWallet(
+                    undefined,
+                    "solana-smart-wallet"
+                );
+                expect(result).toEqual(mockResponse);
+            });
+
+            it("should sign Solana messages", async () => {
+                const mockResponse = {
+                    id: "sig123",
+                    type: "solana-message",
+                    status: "completed",
+                    outputSignature: "solanaSignature",
+                    createdAt: "2024-01-01",
+                };
+                mockFetchResponse(mockResponse);
+
+                // @ts-ignore - Using solana chain for testing
+                const result = await api.signMessageForSmartWallet(
+                    "solana123",
+                    "Hello Solana",
+                    "solana"
+                );
+                expect(result).toEqual(mockResponse);
+            });
+
+            it("should handle Solana transactions", async () => {
+                const mockResponse = {
+                    id: "tx123",
+                    type: "solana-smart-wallet",
+                    status: "pending",
+                    params: {
+                        transaction: "base58encodedtransaction",
+                    },
+                    createdAt: "2024-01-01",
+                };
+                mockFetchResponse(mockResponse);
+
+                // @ts-ignore - Using solana chain for testing
+                const result = await api.createTransactionForSmartWallet(
+                    "solana123",
+                    "base58encodedtransaction",
+                    "solana"
+                );
+                expect(result).toEqual(mockResponse);
+            });
+        });
+
         describe("Custodial Solana Wallet Operations", () => {
             it("should create a custodial wallet", async () => {
                 const mockResponse = {
