@@ -11,6 +11,9 @@
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",
     "types": "./dist/index.d.ts",
+    "engines": {
+        "node": "<23.0"
+    },
     "dependencies": {
         "@goat-sdk/core": "workspace:*",
         "@goat-sdk/wallet-solana": "workspace:*",
