@@ -2,6 +2,7 @@ import { splToken } from "@goat-sdk/plugin-spl-token";
 import { sendSOL, solana } from "@goat-sdk/wallet-solana";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { crossmintHeadlessCheckout } from "@goat-sdk/plugin-crossmint-headless-checkout";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
 import { Connection, Keypair } from "@solana/web3.js";
@@ -23,6 +24,7 @@ const toolsPromise = getOnChainTools({
     plugins: [
         sendSOL(), // Enable SOL transfers
         splToken(), // Enable SPL token operations
+        crossmintHeadlessCheckout({ apiKey: process.env.CROSSMINT_API_KEY as string }),
     ],
 });
 
