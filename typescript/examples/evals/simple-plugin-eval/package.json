@@ -1,0 +1,22 @@
+{
+  "name": "simple-plugin-eval",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup index.ts",
+    "start": "node dist/index.js",
+    "dev": "tsx index.ts"
+  },
+  "dependencies": {
+    "@goat-sdk/core": "workspace:*",
+    "@goat-sdk/plugin-erc20": "workspace:*",
+    "@goat-sdk/wallet-viem": "workspace:*",
+    "@langchain/openai": "^0.1.1",
+    "dotenv": "^16.3.1",
+    "viem": "^1.18.4"
+  },
+  "devDependencies": {
+    "tsx": "^3.12.7",
+    "tsup": "^8.0.2"
+  }
+}
