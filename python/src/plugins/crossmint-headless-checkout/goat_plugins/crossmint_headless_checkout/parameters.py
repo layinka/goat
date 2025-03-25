@@ -1,6 +1,22 @@
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union, Literal
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, root_validator
+
+
+class PaymentMethod(str, Enum):
+    """Payment method options."""
+    ETHEREUM = "ethereum"
+    ETHEREUM_SEPOLIA = "ethereum-sepolia"
+    BASE = "base"
+    BASE_SEPOLIA = "base-sepolia"
+    POLYGON = "polygon"
+    POLYGON_AMOY = "polygon-amoy"
+    SOLANA = "solana"
+
+
+class Currency(str, Enum):
+    """Currency options."""
+    USDC = "usdc"
 
 
 class PhysicalAddress(BaseModel):
@@ -26,6 +42,20 @@ class PhysicalAddress(BaseModel):
         return v
 
 
+class Recipient(BaseModel):
+    """Recipient model for Crossmint orders."""
+    email: str = Field(description="Email of the recipient")
+    physicalAddress: Optional[PhysicalAddress] = Field(None, description="Physical address for shipping")
+
+
+class Payment(BaseModel):
+    """Payment model for Crossmint orders."""
+    method: PaymentMethod = Field(description="The blockchain network to use for the transaction")
+    currency: Currency = Field(description="The currency to use for payment")
+    payerAddress: str = Field(description="The address that will pay for the transaction")
+    receiptEmail: Optional[str] = Field(None, description="Optional email to send payment receipt to")
+
+
 class CollectionLocatorItem(BaseModel):
     """Item with collection locator."""
     collectionLocator: str = Field(
@@ -44,11 +74,11 @@ class ProductLocatorItem(BaseModel):
 
 class CreateAndPayOrderParameters(BaseModel):
     """Parameters for creating and paying for an order."""
-    recipient: Dict[str, Any] = Field(
+    recipient: Recipient = Field(
         description="Where the tokens will be sent to - either a wallet address or email, "
                    "if email is provided a Crossmint wallet will be created and associated with the email"
     )
-    payment: Dict[str, Any] = Field(
+    payment: Payment = Field(
         description="Payment configuration - the desired blockchain, currency and address of the payer - "
                    "optional receipt email, if an email recipient was not provided"
     )

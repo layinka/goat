@@ -2,6 +2,8 @@ import base58
 import json
 from typing import Dict, Any, Optional, List, Union
 import requests
+from solders.transaction import Transaction
+from hexbytes import HexBytes
 
 from goat.decorators.tool import Tool
 from goat_wallets.evm import EVMWalletClient
@@ -91,8 +93,9 @@ class CrossmintHeadlessCheckoutService:
                         "to one supported by your wallet client"
                     )
                 
-                transaction = base58.b58decode(serialized_transaction)
-                solana_tx = wallet_client.deserialize_transaction(transaction)
+                # Deserialize the transaction from base58
+                transaction_bytes = base58.b58decode(serialized_transaction)
+                solana_tx = Transaction.from_bytes(transaction_bytes)
                 
                 send_result = await wallet_client.send_transaction({
                     "instructions": solana_tx.instructions
@@ -109,18 +112,25 @@ class CrossmintHeadlessCheckoutService:
                         "to one supported by your wallet client"
                     )
                 
+                # Ensure hex format
                 if not serialized_transaction.startswith("0x"):
                     serialized_transaction = f"0x{serialized_transaction}"
                 
-                transaction = wallet_client.parse_transaction(serialized_transaction)
-                if transaction.get("to") is None:
-                    raise Exception("Transaction to is null")
-                
+                # For EVM, we can send the raw transaction data
                 print(f"Paying order: {order['orderId']}")
+                
+                # Extract transaction information from order.payment.preparation
+                to_address = order["payment"]["preparation"].get("to")
+                if not to_address:
+                    raise Exception("Transaction to address is missing")
+                
+                # Parse value if available, default to 0
+                value = int(order["payment"]["preparation"].get("value", "0"), 16) if order["payment"]["preparation"].get("value") else 0
+                
                 send_result = await wallet_client.send_transaction({
-                    "to": transaction["to"],
-                    "value": transaction.get("value", 0),
-                    "data": transaction["data"]
+                    "to": to_address,
+                    "value": value,
+                    "data": serialized_transaction
                 })
                 
                 return {"order": order, "txId": send_result["hash"]}
