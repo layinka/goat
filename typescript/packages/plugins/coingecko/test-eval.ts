@@ -1,15 +1,14 @@
 import { runEvals } from "@goat-sdk/core/src/evals/utils/runEvals";
+import { viem } from "@goat-sdk/wallet-viem";
+import { ChatOpenAI } from "@langchain/openai";
 import { createWalletClient } from "viem";
 import { http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mainnet } from "viem/chains";
-import { USDC, erc20 } from "./src";
-import { ERC20_ALL_TOOLS_DATASET } from "./src/eval";
+import { coingecko } from "./src";
+import { ALL_TOOLS_DATASET } from "./src/eval";
 
 require("dotenv").config();
-
-// Import ChatOpenAI from langchain
-const { ChatOpenAI } = require("langchain/chat_models/openai");
 
 // Set up LLM
 const llm = new ChatOpenAI({
@@ -25,19 +24,16 @@ const walletClient = createWalletClient({
     chain: mainnet,
 });
 
-// Import viem wallet adapter
-const { viem: viemAdapter } = require("@goat-sdk/wallet-viem/src");
-
 async function runTest() {
     try {
         const result = await runEvals(
-            ERC20_ALL_TOOLS_DATASET,
+            ALL_TOOLS_DATASET,
             {
-                wallet: viemAdapter(walletClient),
-                plugins: [erc20({ tokens: [USDC] })],
+                wallet: viem(walletClient),
+                plugins: [coingecko()],
                 llm,
             },
-            "ERC20 Plugin Evaluation Tests",
+            "CoinGecko Plugin Evaluation Tests",
         );
 
         console.log("\nEvaluation Summary:");
