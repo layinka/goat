@@ -1,7 +1,11 @@
 {
     "name": "@goat-sdk/plugin-0x",
     "version": "0.1.9",
-    "files": ["dist/**/*", "README.md", "package.json"],
+    "files": [
+        "dist/**/*",
+        "README.md",
+        "package.json"
+    ],
     "scripts": {
         "build": "tsup",
         "clean": "rm -rf dist",
@@ -20,7 +24,11 @@
     "bugs": {
         "url": "https://github.com/goat-sdk/goat/issues"
     },
-    "keywords": ["ai", "agents", "web3"],
+    "keywords": [
+        "ai",
+        "agents",
+        "web3"
+    ],
     "dependencies": {
         "@goat-sdk/core": "workspace:*",
         "zod": "catalog:",
