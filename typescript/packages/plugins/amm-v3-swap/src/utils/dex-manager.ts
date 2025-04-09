@@ -1,38 +1,35 @@
-import { DEX_CONFIGS, DexAddresses } from '../config/dex.config';
+import { DEX_CONFIGS, DexAddresses } from "../config/dex.config";
 
-export class DexManager {
-    static getDexConfig(chainId: number, dexName: string): DexAddresses {
-        const chainConfig = DEX_CONFIGS[chainId];
-        if (!chainConfig) {
-            throw new Error(`Chain ID ${chainId} not supported`);
-        }
-
-        const dexConfig = chainConfig[dexName.toLowerCase()];
-        if (!dexConfig) {
-            throw new Error(`DEX ${dexName} not found on chain ${chainId}`);
-        }
-
-        return dexConfig;
+export function getDexConfig(chainId: number, dexName: string): DexAddresses {
+    const chainConfig = DEX_CONFIGS[chainId];
+    if (!chainConfig) {
+        throw new Error(`Chain ID ${chainId} not supported`);
     }
 
-    static isValidDex(chainId: number, dexName: string): boolean {
-        try {
-            this.getDexConfig(chainId, dexName);
-            return true;
-        } catch {
-            return false;
-        }
+    const dexConfig = chainConfig[dexName.toLowerCase()];
+    if (!dexConfig) {
+        throw new Error(`DEX ${dexName} not found on chain ${chainId}`);
     }
 
-    static getSupportedDexes(chainId: number): string[] {
-        const chainConfig = DEX_CONFIGS[chainId];
-        if (!chainConfig) {
-            return [];
-        }
-        return Object.keys(chainConfig);
+    return dexConfig;
+}
+export function isValidDex(chainId: number, dexName: string): boolean {
+    try {
+        getDexConfig(chainId, dexName);
+        return true;
+    } catch {
+        return false;
     }
+}
 
-    static getSupportedChains(): number[] {
-        return Object.keys(DEX_CONFIGS).map(Number);
+export function getSupportedDexes(chainId: number): string[] {
+    const chainConfig = DEX_CONFIGS[chainId];
+    if (!chainConfig) {
+        return [];
     }
+    return Object.keys(chainConfig);
+}
+
+export function getSupportedChains(): number[] {
+    return Object.keys(DEX_CONFIGS).map(Number);
 }

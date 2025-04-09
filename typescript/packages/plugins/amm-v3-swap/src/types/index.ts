@@ -1,12 +1,12 @@
 export enum ChainId {
     ETHEREUM = 1,
     CELO = 42220,
-    CELO_ALFAJORES = 44787
+    CELO_ALFAJORES = 44787,
 }
 
 export interface Token {
     address: string;
-    chainId: ChainId|number;
+    chainId: ChainId | number;
     decimals: number;
     symbol: string;
     name: string;
@@ -21,12 +21,12 @@ export interface Pool {
     liquidity: bigint;
     tick: number;
     address: string;
-    createdAt?: number;      // Block number when pool was created
-    tvlUSD?: number;         // Total value locked in USD
-    volume24h?: number;      // 24-hour trading volume in USD
-    feesUSD24h?: number;     // 24-hour fees earned in USD
-    token0Price?: number;    // Current price of token0 in terms of token1
-    token1Price?: number;    // Current price of token1 in terms of token0
+    createdAt?: number; // Block number when pool was created
+    tvlUSD?: number; // Total value locked in USD
+    volume24h?: number; // 24-hour trading volume in USD
+    feesUSD24h?: number; // 24-hour fees earned in USD
+    token0Price?: number; // Current price of token0 in terms of token1
+    token1Price?: number; // Current price of token1 in terms of token0
 }
 
 export interface Position {

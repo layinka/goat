@@ -1,20 +1,19 @@
 import { type Chain, PluginBase } from "@goat-sdk/core";
+import { EVMWalletClient } from "@goat-sdk/wallet-evm";
 import { base, celo, celoAlfajores, hardhat, optimism, sonic, sonicTestnet } from "viem/chains";
-import { DefiLlamaService } from "./defillama.service";
+import { CompoundV2Service } from "./compound-v2.service";
 
 const supportedChains = [base, optimism, sonic, sonicTestnet, celo, celoAlfajores, hardhat];
-
-export class DefiLlamaPlugin extends PluginBase {
+export class CompoundV2Plugin extends PluginBase<EVMWalletClient> {
     constructor() {
-        super("defillama", [new DefiLlamaService()]);
+        super("compound-v2", [new CompoundV2Service()]);
     }
 
     supportsChain(chain: Chain): boolean {
         return chain.type === "evm" && supportedChains.some((ss) => ss.id === chain.id);
     }
-    // supportsChain = () => true;
 }
 
-export function defillama() {
-    return new DefiLlamaPlugin();
+export function compoundv2() {
+    return new CompoundV2Plugin();
 }

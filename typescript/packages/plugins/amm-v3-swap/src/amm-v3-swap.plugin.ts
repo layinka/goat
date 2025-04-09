@@ -1,12 +1,17 @@
-import { PluginBase } from "@goat-sdk/core";
+import { type Chain, PluginBase } from "@goat-sdk/core";
+import { base, celo, celoAlfajores, hardhat, optimism, sonic, sonicTestnet } from "viem/chains";
 import { AmmV3SwapService } from "./amm-v3-swap.service";
 
-export class AmmV3SwapPlugin extends PluginBase {
+const supportedChains = [base, optimism, sonic, sonicTestnet, celo, celoAlfajores, hardhat];
+
+export class AmmV3SwapPlugin extends PluginBase<EVMWalletClient> {
     constructor() {
         super("amm-v3-swap", [new AmmV3SwapService()]);
     }
 
-    supportsChain = () => true;
+    supportsChain(chain: Chain): boolean {
+        return chain.type === "evm" && supportedChains.some((ss) => ss.id === chain.id);
+    }
 }
 
 export function ammv3swap() {
